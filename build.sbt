@@ -3,7 +3,7 @@ lazy val commonSettings = Seq(
 	name := "business-index-data",
 	version := "0.1.0",
 	scalaVersion := "2.10.6",
-	organisation := "uk.gov.ons",
+	organization := "uk.gov.ons",
 	resolvers ++= Seq(
 	  // allows us to include spark packages
 	  Resolver.typesafeRepo("releases"),
