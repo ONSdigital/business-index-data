@@ -30,7 +30,7 @@ class SparkIngestion(
 
   def setup(): Unit = {
     Await.result(
-      Initializer(indexes: _*)(elastic) recover {
+      Initializer(indexes: _*)(elastic, scala.concurrent.ExecutionContext.Implicits.global) recover {
         case e: IndexAlreadyExistsException => {
           logger.error("Index already exists, but the error can be silenced", e)
         }

@@ -3,7 +3,7 @@ package uk.gov.ons.bi.ingest.writers.indexes
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.FieldType._
 import com.sksamuel.elastic4s.mappings.MappingDefinition
-import uk.gov.ons.ingest.writers.Initializer
+import uk.gov.ons.bi.ingest.writers.Initializer
 
 class PayeIndex extends Initializer {
 
