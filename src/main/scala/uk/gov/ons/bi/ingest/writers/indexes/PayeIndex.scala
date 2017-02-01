@@ -5,7 +5,6 @@ import com.sksamuel.elastic4s.mappings.FieldType._
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import uk.gov.ons.ingest.writers.Initializer
 
-
 class PayeIndex extends Initializer {
 
   override def recordName: String = "paye_receord"
@@ -61,7 +60,7 @@ class PayeIndex extends Initializer {
     field("succession_out_identifier", StringType) index "not_analyzed" includeInAll false,
     field("date_of_transfer", DateType) index "not_analyzed" includeInAll false,
     field("scheme_cancelled_date", DateType) index "not_analyzed" includeInAll false,
-    field("scheme_reopened_date", DateType) index "not_analyzed" includeInAll false,
+    field("scheme_reopened_date", DateType) index "not_analyzed" includeInAll false
   )
 }
 
