@@ -1,10 +1,12 @@
-package uk.gov.ons.ingest.writers
+package uk.gov.ons.bi.ingest.writers
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
-import org.elasticsearch.spark.sql._
 import org.elasticsearch.spark._
+import org.elasticsearch.spark.sql._
+
+import scala.reflect.ClassTag
 
 class ElasticIndexes(config: Config) {
   final val payeIndex: String = config.getString("elasticsearch.indices.paye")
@@ -21,8 +23,6 @@ class ElasticIndexes(config: Config) {
   */
 object ElasticWriter {
 
-  private lazy val config = ConfigFactory.load()
-
   /**
     * Stores data into ElasticSearch.
     * @param data `DataFrame` containing addresses
@@ -32,5 +32,5 @@ object ElasticWriter {
   /**
     * Stores arbitrary records
     */
-  def save[T](index: String, data: RDD[T]): Unit = data.saveToEs(index)
+  def save[T : ClassTag](index: String, data: RDD[T]): Unit = data.saveToEs(index)
 }
