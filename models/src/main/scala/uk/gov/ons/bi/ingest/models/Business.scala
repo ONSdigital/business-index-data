@@ -1,4 +1,4 @@
-package uk.gov.ons.bi.ingest.records.models
+package uk.gov.ons.bi.ingest.models
 
 object Hmrc {
   case class VatRecord(

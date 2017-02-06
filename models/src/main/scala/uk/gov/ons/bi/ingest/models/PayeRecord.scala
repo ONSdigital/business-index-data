@@ -1,7 +1,4 @@
-package uk.gov.ons.bi.ingest.records.models
-
-import org.joda.time.DateTime
-import uk.gov.ons.bi.ingest.records.parsers._
+package uk.gov.ons.bi.ingest.models
 
 case class Address(
   line_1: String,

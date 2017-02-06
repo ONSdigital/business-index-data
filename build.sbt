@@ -1,9 +1,13 @@
 lazy val Versions = new {
-  val phantom = "2.1.1"
-  val util = "0.27.8"
+  val phantom = "2.1.2"
+  val util = "0.28.0"
   val elastic4s = "2.3.1"
   val spark = "1.6.0"
   val elasticSearchSpark = "2.4.0"
+  val json4s = "3.5.0"
+  val scallop = "0.9.5"
+  val joda = "2.9.4"
+  val jodaConvert = "1.8.1"
 }
 
 lazy val commonSettings = Seq(
@@ -39,14 +43,29 @@ lazy val commonSettings = Seq(
 
 lazy val businessIndex = (project in file("."))
 	.settings(commonSettings: _*)
-	.settings(
-		libraryDependencies ++= Seq(
-			"org.rogach" %% "scallop" % "0.9.5",
-			"com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s,
-			"org.apache.spark" %% "spark-core" % Versions.spark,
-			"org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
-				ExclusionRule(organization = "javax.servlet")
-			},
-			"com.outworkers" %% "util-testing" % Versions.util % Test
-		)
-	)
+  .aggregate(sparkIngestion, models)
+
+lazy val sparkIngestion = (project in file("ingestion"))
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.json4s" %% "json4s-native" % Versions.json4s,
+      "org.rogach" %% "scallop" % Versions.scallop,
+      "com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s,
+      "org.apache.spark" %% "spark-core" % Versions.spark,
+      "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
+        ExclusionRule(organization = "javax.servlet")
+      },
+      "com.outworkers" %% "util-testing" % Versions.util % Test
+    )
+  ).dependsOn(models)
+
+lazy val models = (project in file("models"))
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "joda-time" %  "joda-time" % Versions.joda,
+      "org.joda" %  "joda-convert" % Versions.jodaConvert,
+      "com.outworkers" %% "util-testing" % Versions.util % Test
+    )
+  )
