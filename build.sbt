@@ -11,9 +11,8 @@ lazy val Versions = new {
 }
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.10.6",
   resolvers ++= Seq(
-    Resolver.bintrayRepo("outworkers", "oss-releases"),
     "splunk" at "http://splunk.artifactoryonline.com/splunk/ext-releases-local"
   ),
   scalacOptions in ThisBuild ++= Seq(
@@ -49,7 +48,7 @@ lazy val businessIndex = (project in file("."))
   ).aggregate(
     models,
     sparkIngestion
-  )
+  ).enablePlugins(CrossPerProjectPlugin)
 
 lazy val sparkIngestion = (project in file("ingestion"))
   .settings(commonSettings: _*)
@@ -65,7 +64,9 @@ lazy val sparkIngestion = (project in file("ingestion"))
       },
       "com.outworkers" %% "util-testing" % Versions.util % Test
     )
-  ).dependsOn(models)
+  ).dependsOn(
+    models
+  ).enablePlugins(CrossPerProjectPlugin)
 
 lazy val models = (project in file("models"))
   .settings(commonSettings: _*)
@@ -76,4 +77,4 @@ lazy val models = (project in file("models"))
       "org.joda" %  "joda-convert" % Versions.jodaConvert,
       "com.outworkers" %% "util-testing" % Versions.util % Test
     )
-  )
+  ).enablePlugins(CrossPerProjectPlugin)
