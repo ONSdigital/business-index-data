@@ -31,8 +31,6 @@ lazy val commonSettings = Seq(
     "-Ywarn-value-discard", // Warn when non-Unit expression results are unused
     "-Ywarn-inaccessible", // Warn about inaccessible types in method signatures
     "-Ywarn-dead-code", // Warn when dead code is identified
-    "-Ywarn-unused", // Warn when local and private vals, vars, defs, and types are unused
-    "-Ywarn-unused-import", //  Warn when imports are unused (don't want IntelliJ to do it automatically)
     "-Ywarn-numeric-widen" // Warn when numerics are widened
   )
 )
