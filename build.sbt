@@ -43,11 +43,18 @@ lazy val commonSettings = Seq(
 
 lazy val businessIndex = (project in file("."))
 	.settings(commonSettings: _*)
-  .aggregate(sparkIngestion, models)
+  .settings(
+    name := "business-index-data",
+    moduleName := "business-index-data"
+  ).aggregate(
+    models,
+    sparkIngestion
+  )
 
 lazy val sparkIngestion = (project in file("ingestion"))
   .settings(commonSettings: _*)
   .settings(
+    crossScalaVersions := Seq("2.10.6"),
     libraryDependencies ++= Seq(
       "org.json4s" %% "json4s-native" % Versions.json4s,
       "org.rogach" %% "scallop" % Versions.scallop,
@@ -63,6 +70,7 @@ lazy val sparkIngestion = (project in file("ingestion"))
 lazy val models = (project in file("models"))
   .settings(commonSettings: _*)
   .settings(
+    crossScalaVersions := Seq("2.10.6", "2.11.8"),
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
       "org.joda" %  "joda-convert" % Versions.jodaConvert,
