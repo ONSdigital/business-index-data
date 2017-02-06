@@ -1,5 +1,7 @@
 package uk.gov.ons.bi.ingest.models
 
+import org.joda.time.DateTime
+
 case class Address(
   line_1: String,
   line_2: String,

@@ -11,14 +11,11 @@ lazy val Versions = new {
 }
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.10.6",
   resolvers ++= Seq(
     "splunk" at "http://splunk.artifactoryonline.com/splunk/ext-releases-local"
   ),
   scalacOptions in ThisBuild ++= Seq(
-    "-language:experimental.macros",
-    "-target:jvm-1.8",
-    "-encoding", "UTF-8",
+    "-encoding","UTF-8",
     "-language:reflectiveCalls",
     "-language:experimental.macros",
     "-language:implicitConversions",
@@ -75,6 +72,7 @@ lazy val models = (project in file("models"))
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
       "org.joda" %  "joda-convert" % Versions.jodaConvert,
+      "com.outworkers" %% "util-parsers-cats" % Versions.util,
       "com.outworkers" %% "util-testing" % Versions.util % Test
     )
   ).enablePlugins(CrossPerProjectPlugin)
