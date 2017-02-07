@@ -3,7 +3,11 @@ package uk.gov.ons.bi.ingest.models
 import cats.data.ValidatedNel
 import org.joda.time.DateTime
 import uk.gov.ons.bi.ingest.parsers.CsvParser
-import com.outworkers.util.catsparsers._
+import com.outworkers.util.parsers._
+import com.outworkers.util.validators._
+import uk.gov.ons.bi.ingest.parsers._
+
+import scala.util.Try
 
 case class Accounts(
   accounts_ref_day: String,
@@ -13,18 +17,32 @@ case class Accounts(
   account_category: Option[String]
 )
 
+
 object Accounts {
   implicit object AccountsParser extends CsvParser[Accounts] {
     override def extract(sourceType: Seq[String]): ValidatedNel[String, Accounts] = {
       parse[String](sourceType.head).prop("accounts_ref_day") and
+        parse[String](sourceType(1)).prop("accounts_ref_month") and
+        parseNonEmpty[DateTime](sourceType.value(2)).prop("next_due_date") and
+        parseNonEmpty[DateTime](sourceType.value(3)).prop("last_made_up_date") and
+        parseNonEmpty[String](sourceType.value(4)).prop("account_category") map (_.as[Accounts])
     }
   }
 }
 
 case class Returns(
   next_due_date: DateTime,
-  last_made_up_date: DateTime
+  last_made_up_date: Option[DateTime]
 )
+
+object Returns {
+  implicit object ReturnsParser extends CsvParser[Returns] {
+    override def extract(sourceType: Seq[String]): ValidatedNel[String, Returns] = {
+      parse[DateTime](sourceType.head).prop("next_due_date") and
+        parseNonEmpty[DateTime](sourceType.value(1)).prop("last_made_up_date") map (_.as[Returns])
+    }
+  }
+}
 
 case class Mortgages(
   num_mort_charges: Option[Int],
@@ -71,7 +89,7 @@ case class CompaniesHouseRecord(
   dissolution_date: Option[DateTime],
   incorporation_date: Option[DateTime],
   accounts: Accounts,
-  returns: Returns,
+  returns: Option[Returns],
   sic_code: SICCode,
   limitedPartnerships: LimitedPartnerships,
   uri: Option[String],

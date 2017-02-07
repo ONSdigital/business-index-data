@@ -8,6 +8,7 @@ lazy val Versions = new {
   val scallop = "0.9.5"
   val joda = "2.9.4"
   val jodaConvert = "1.8.1"
+  val shapeless = "2.3.1"
 }
 
 lazy val commonSettings = Seq(
@@ -70,7 +71,8 @@ lazy val models = (project in file("models"))
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
       "org.joda" %  "joda-convert" % Versions.jodaConvert,
-      "com.outworkers" %% "util-parsers-cats" % Versions.util,
+      "com.chuusai" %% "shapeless" % Versions.shapeless,
+      "com.outworkers" %% "util-parsers" % Versions.util,
       "com.outworkers" %% "util-validators" % Versions.util,
       "com.outworkers" %% "util-testing" % Versions.util % Test
     )
