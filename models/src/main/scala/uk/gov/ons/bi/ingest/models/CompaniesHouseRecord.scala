@@ -83,6 +83,15 @@ case class LimitedPartnerships(
   num_lim_partners: Int
 )
 
+object LimitedPartnerships {
+  implicit object SICCodeParser extends CsvParser[LimitedPartnerships] {
+    override def extract(sourceType: Seq[String]): Nel[LimitedPartnerships] = {
+      parse[Int](sourceType.value(0)).prop("num_gen_partners") and
+        parse[Int](sourceType.value(1)).prop("num_lim_partners") map (_.as[LimitedPartnerships])
+    }
+  }
+}
+
 case class PreviousName(
   condate: String,
   company_name: String
@@ -98,6 +107,21 @@ case class RegistrationAddress(
   country: Option[String],
   postcode: Option[String]
 )
+
+object RegistrationAddress {
+  implicit object RegistrationAddressParser extends CsvParser[RegistrationAddress] {
+    override def extract(sourceType: Seq[String]): Nel[RegistrationAddress] = {
+      parseNonEmpty[String](sourceType.value(0)).prop("care_of") and
+        parseNonEmpty[String](sourceType.value(1)).prop("po_box") and
+        parseNonEmpty[String](sourceType.value(2)).prop("address_line_1") and
+        parseNonEmpty[String](sourceType.value(3)).prop("address_line_2") and
+        parseNonEmpty[String](sourceType.value(4)).prop("post_town") and
+        parseNonEmpty[String](sourceType.value(5)).prop("county") and
+        parseNonEmpty[String](sourceType.value(6)).prop("country") and
+        parseNonEmpty[String](sourceType.value(7)).prop("postcode") map (_.as[RegistrationAddress])
+    }
+  }
+}
 
 case class CompaniesHouseRecord(
   id: String,
