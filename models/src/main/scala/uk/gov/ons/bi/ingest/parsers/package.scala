@@ -2,9 +2,6 @@ package uk.gov.ons.bi.ingest
 
 import shapeless.Generic
 
-import scala.collection.{GenSeqLike, TraversableOnce}
-
-
 package object parsers {
 
 
@@ -16,6 +13,22 @@ package object parsers {
     def offset(num: OffsetDelimiter): (String, OffsetDelimiter) = str -> num
   }
 
+  /**
+    * Converts a tuple that we obtained from a validation chain to a case class
+    * if the type of the parameters in the tuple match the types of the fields
+    * of the case class in the same order.
+    *
+    * Example: {{{
+    *   case class Record(num: Int, text: String, date: DateTime)
+    *   val x: (Int, String, DateTime) = Tuple3(5, "text", new DateTime)
+    *
+    *   val generic = implicitly[Generic.Aux[Record, (Int, String, DateTime)]]
+    *   var record: Record = gen to x
+    *   record == Record(5, "text", new DateTime)
+    * }}}
+    * @param obj The tuple object to convert to a case class instance.
+    * @tparam T The type of the object to augment with the as method.
+    */
   implicit class TpAs[T](val obj: T) extends AnyVal {
     def as[Caster](implicit gen: Generic.Aux[T, Caster]) = gen to obj
   }

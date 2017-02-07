@@ -50,7 +50,6 @@ case class Mortgages(
 )
 
 object Mortgages {
-
   implicit object Mortgages extends CsvParser[Mortgages] {
     override def extract(sourceType: Seq[String]): Nel[Mortgages] = {
       parseNonEmpty[Int](sourceType.value(0)).prop("num_mort_charges") and
@@ -67,6 +66,17 @@ case class SICCode(
   sic_text_3: String,
   sic_text_4: String
 )
+
+object SICCode {
+  implicit object SICCodeParser extends CsvParser[SICCode] {
+    override def extract(sourceType: Seq[String]): Nel[SICCode] = {
+      parse[String](sourceType.value(0)).prop("sic_text_1") and
+        parse[String](sourceType.value(1)).prop("sic_text_2") and
+        parse[String](sourceType.value(2)).prop("sic_text_3") and
+        parse[String](sourceType.value(3)).prop("sic_text_4") map (_.as[SICCode])
+    }
+  }
+}
 
 case class LimitedPartnerships(
   num_gen_partners: Int,
