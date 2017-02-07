@@ -1,6 +1,7 @@
 package uk.gov.ons.bi.ingest
 
 import shapeless.Generic
+import com.outworkers.util.validators.Nel
 
 package object parsers {
 
@@ -11,6 +12,10 @@ package object parsers {
 
   implicit class StringAugmenter(val str: String) extends AnyVal {
     def offset(num: OffsetDelimiter): (String, OffsetDelimiter) = str -> num
+  }
+
+  implicit class NelAugmenter[T](val nel: Nel[T]) extends AnyVal {
+    def prop(key: String): Nel[T] = nel
   }
 
   /**

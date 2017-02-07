@@ -97,6 +97,15 @@ case class PreviousName(
   company_name: String
 )
 
+object PreviousName {
+  implicit object PreviousNameParser extends CsvParser[PreviousName] {
+    override def extract(sourceType: Seq[String]): Nel[PreviousName] = {
+      parse[String](sourceType.value(0)).prop("condate") and
+        parse[String](sourceType.value(1)).prop("company_name") map (_.as[PreviousName])
+    }
+  }
+}
+
 case class RegistrationAddress(
   care_of: Option[String],
   po_box: Option[String],
@@ -148,3 +157,20 @@ case class CompaniesHouseRecord(
   previous_name_9: Option[PreviousName],
   previous_name_10: Option[PreviousName]
 )
+
+object CompaniesHouseRecord {
+  implicit object CompaniesHouseRecordParser extends CsvParser[CompaniesHouseRecord] {
+    override def extract(source: Seq[String]): ValidatedNel[String, CompaniesHouseRecord] = {
+      parse[String](source.value(1)).prop("id") and
+        parse[String](source.value(2)).prop("company_name") and
+        parse[String](source.value(3)).prop("company_number") and
+        parse[String](source.value(4)).prop("company_category") and
+        parse[String](source.value(5)).prop("company_status") and
+        parse[String](source.value(6)).prop("country_of_origin") and
+        parseNonEmpty[DateTime](source.value(7)).prop("dissolution_date") and
+        parseNonEmpty[DateTime](source.value(8)).prop("incorporation_date") and
+        CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts")
+
+    }
+  }
+}

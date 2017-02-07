@@ -1,11 +1,11 @@
 package uk.gov.ons.bi.ingest.parsers
 
-import cats.data.ValidatedNel
+import com.outworkers.util.validators.Nel
 
 trait RecordParser[RecordType] {
   type SourceType
 
-  def extract(sourceType: SourceType): ValidatedNel[String, RecordType]
+  def extract(sourceType: SourceType): Nel[RecordType]
 }
 
 object RecordParser {
@@ -14,4 +14,8 @@ object RecordParser {
 
 trait CsvParser[R] extends RecordParser[R] {
   override type SourceType = Seq[String]
+}
+
+object CsvParser {
+  def apply[R]()(implicit parser: CsvParser[R]): CsvParser[R] = parser
 }
