@@ -71,6 +71,7 @@ lazy val models = (project in file("models"))
       "joda-time" %  "joda-time" % Versions.joda,
       "org.joda" %  "joda-convert" % Versions.jodaConvert,
       "com.outworkers" %% "util-parsers-cats" % Versions.util,
+      "com.outworkers" %% "util-validators" % Versions.util,
       "com.outworkers" %% "util-testing" % Versions.util % Test
     )
   ).enablePlugins(CrossPerProjectPlugin)

@@ -1,6 +1,9 @@
 package uk.gov.ons.bi.ingest.models
 
+import cats.data.ValidatedNel
 import org.joda.time.DateTime
+import uk.gov.ons.bi.ingest.parsers.CsvParser
+import com.outworkers.util.catsparsers._
 
 case class Accounts(
   accounts_ref_day: String,
@@ -9,6 +12,14 @@ case class Accounts(
   last_made_up_date: Option[DateTime],
   account_category: Option[String]
 )
+
+object Accounts {
+  implicit object AccountsParser extends CsvParser[Accounts] {
+    override def extract(sourceType: Seq[String]): ValidatedNel[String, Accounts] = {
+      parse[String](sourceType.head).prop("accounts_ref_day") and
+    }
+  }
+}
 
 case class Returns(
   next_due_date: DateTime,

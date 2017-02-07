@@ -1,4 +1,4 @@
-package uk.gov.ons.bi.ingest.records
+package uk.gov.ons.bi.ingest
 
 package object parsers {
 

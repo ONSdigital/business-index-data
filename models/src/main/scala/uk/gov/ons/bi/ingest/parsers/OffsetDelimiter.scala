@@ -1,4 +1,4 @@
-package uk.gov.ons.bi.ingest.records.parsers
+package uk.gov.ons.bi.ingest.parsers
 
 case class OffsetDelimiter(
   start: Int,

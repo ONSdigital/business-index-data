@@ -1,6 +1,6 @@
-package uk.gov.ons.bi.ingest.records.parsers
+package uk.gov.ons.bi.ingest.parsers
 
-case class OffsetParser(
+case class OffsetFormat(
   config: Map[String, OffsetDelimiter]
 ) {
 
@@ -16,8 +16,8 @@ case class OffsetParser(
   }
 }
 
-object OffsetParser {
-  def apply(objects: (String, OffsetDelimiter)*): OffsetParser = {
-    OffsetParser(config = objects.toMap)
+object OffsetFormat {
+  def apply(objects: (String, OffsetDelimiter)*): OffsetFormat = {
+    OffsetFormat(config = objects.toMap)
   }
 }
