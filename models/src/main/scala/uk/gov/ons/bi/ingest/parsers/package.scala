@@ -5,6 +5,8 @@ import cats.data.ValidatedNel
 import com.outworkers.util.catsparsers.CatsParser
 import shapeless.Generic
 import com.outworkers.util.validators.dsl.Nel
+import shapeless.ops.hlist.Tupler
+import shapeless.syntax.std.tuple._
 
 package object parsers {
 

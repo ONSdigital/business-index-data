@@ -6,6 +6,7 @@ import uk.gov.ons.bi.ingest.parsers.CsvParser
 import com.outworkers.util.catsparsers._
 import com.outworkers.util.validators.dsl._
 import uk.gov.ons.bi.ingest.parsers._
+import TupleGeneric._
 
 case class Accounts(
   accounts_ref_day: String,
@@ -23,7 +24,16 @@ object Accounts {
         parse[String](sourceType(1)).prop("accounts_ref_month") and
         parseNonEmpty[DateTime](sourceType.value(2)).prop("next_due_date") and
         parseNonEmpty[DateTime](sourceType.value(3)).prop("last_made_up_date") and
-        parseNonEmpty[String](sourceType.value(4)).prop("account_category") map(_.as[Accounts])
+        parseNonEmpty[String](sourceType.value(4)).prop("account_category") map {
+        case (day, month, nextDueDate, lastMadeUpToDate, category) =>
+          Accounts(
+            accounts_ref_day = day,
+            accounts_ref_month = month,
+            next_due_date = nextDueDate,
+            last_made_up_date = lastMadeUpToDate,
+            account_category = category
+          )
+        }
     }
   }
 }
@@ -122,12 +132,12 @@ object RegistrationAddress {
     override def extract(sourceType: Seq[String]): Nel[RegistrationAddress] = {
       parseNonEmpty[String](sourceType.value(0)).prop("care_of") and
         parseNonEmpty[String](sourceType.value(1)).prop("po_box") and
-        parseNonEmpty[String](sourceType.value(2)).prop("address_line_1") and
-        parseNonEmpty[String](sourceType.value(3)).prop("address_line_2") and
+        parse[String](sourceType.value(2)).prop("address_line_1") and
+        parse[String](sourceType.value(3)).prop("address_line_2") and
         parseNonEmpty[String](sourceType.value(4)).prop("post_town") and
         parseNonEmpty[String](sourceType.value(5)).prop("county") and
         parseNonEmpty[String](sourceType.value(6)).prop("country") and
-        parseNonEmpty[String](sourceType.value(7)).prop("postcode") map(_.as[RegistrationAddress])
+        parseNonEmpty[String](sourceType.value(7)).prop("postcode") map {tp => tp.as[RegistrationAddress]}
     }
   }
 }
