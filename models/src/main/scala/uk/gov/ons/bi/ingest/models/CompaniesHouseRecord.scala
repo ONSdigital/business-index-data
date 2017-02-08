@@ -47,7 +47,7 @@ object Returns {
     override def extract(sourceType: Seq[String]): Nel[Returns] = {
       parse[DateTime](sourceType.getIndex(0)).prop("next_due_date") and
         parseNonEmpty[DateTime](sourceType.getIndex(1)).prop("last_made_up_date") map {
-          case (nextDate, lastDate) => new Returns(nextDate, lastDate)
+        case (nextDate, lastDate) => new Returns(nextDate, lastDate)
       }
     }
   }

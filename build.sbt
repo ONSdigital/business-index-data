@@ -1,6 +1,6 @@
 lazy val Versions = new {
   val phantom = "2.1.2"
-  val util = "0.28.1"
+  val util = "0.28.2"
   val elastic4s = "2.3.1"
   val spark = "1.6.0"
   val elasticSearchSpark = "2.4.0"
