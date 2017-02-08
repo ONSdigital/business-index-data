@@ -173,7 +173,10 @@ object PreviousNames {
       CsvParser[PreviousName].extract(source.slice(12, 14)).prop("previous_name_7") and
       CsvParser[PreviousName].extract(source.slice(14, 16)).prop("previous_name_8") and
       CsvParser[PreviousName].extract(source.slice(16, 18)).prop("previous_name_9") and
-      CsvParser[PreviousName].extract(source.slice(18, 20)).prop("previous_name_10") map(_.as[PreviousNames])
+      CsvParser[PreviousName].extract(source.slice(18, 20)).prop("previous_name_10") map {
+        case (pn1, pn2, pn3, pn4, pn5, pn6, pn7, pn8, pn9, pn10) =>
+          PreviousNames(pn1, pn2, pn3, pn4, pn5, pn6, pn7, pn8, pn9, pn10)
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
 package uk.gov.ons.bi.ingest.parsers
 
+import com.outworkers.util.catsparsers.CatsBiParser
 import com.outworkers.util.validators.dsl.Nel
 
 trait RecordParser[RecordType] {
@@ -12,7 +13,7 @@ object RecordParser {
   type Aux[Record, Source] = RecordParser[Record] { type SourceType = Source }
 }
 
-trait CsvParser[R] extends RecordParser[R] {
+trait CsvParser[R] extends RecordParser[R] with CatsBiParser[Seq[String], R] {
   override type SourceType = Seq[String]
 }
 
