@@ -47,7 +47,7 @@ package object parsers {
   }
 
   implicit class TraversableOps[T](val col: Seq[T]) extends AnyVal {
-    def value(index: Int): Option[T] = if (col.isDefinedAt(index)) Some(col(index)) else None
+    def getIndex(index: Int): Option[T] = if (col.isDefinedAt(index)) Some(col(index)) else None
   }
 
 

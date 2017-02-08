@@ -22,9 +22,9 @@ object Accounts {
     override def extract(sourceType: Seq[String]): Nel[Accounts] = {
       parse[String](sourceType.head).prop("accounts_ref_day") and
         parse[String](sourceType(1)).prop("accounts_ref_month") and
-        parseNonEmpty[DateTime](sourceType.value(2)).prop("next_due_date") and
-        parseNonEmpty[DateTime](sourceType.value(3)).prop("last_made_up_date") and
-        parseNonEmpty[String](sourceType.value(4)).prop("account_category") map {
+        parseNonEmpty[DateTime](sourceType.getIndex(2)).prop("next_due_date") and
+        parseNonEmpty[DateTime](sourceType.getIndex(3)).prop("last_made_up_date") and
+        parseNonEmpty[String](sourceType.getIndex(4)).prop("account_category") map {
         case (day, month, nextDueDate, lastMadeUpToDate, category) =>
           Accounts(
             accounts_ref_day = day,
@@ -46,10 +46,9 @@ case class Returns(
 object Returns {
   implicit object ReturnsParser extends CsvParser[Returns] {
     override def extract(sourceType: Seq[String]): Nel[Returns] = {
-      parse[DateTime](sourceType.head).prop("next_due_date") and
-        parseNonEmpty[DateTime](sourceType.value(1)).prop("last_made_up_date") map { tp =>
-        val gen = TupleGeneric[Returns]
-        gen from tp
+      parse[DateTime](sourceType.getIndex(0)).prop("next_due_date") and
+        parseNonEmpty[DateTime](sourceType.getIndex(1)).prop("last_made_up_date") map { case (nextDate, lastDate) =>
+          new Returns(nextDate, lastDate)
       }
     }
   }
@@ -65,10 +64,10 @@ case class Mortgages(
 object Mortgages {
   implicit object Mortgages extends CsvParser[Mortgages] {
     override def extract(sourceType: Seq[String]): Nel[Mortgages] = {
-      parseNonEmpty[Int](sourceType.value(0)).prop("num_mort_charges") and
-        parseNonEmpty[Int](sourceType.value(1)).prop("num_mort_outstanding") and
-        parseNonEmpty[Int](sourceType.value(2)).prop("num_mort_part_satisfied") and
-        parseNonEmpty[Int](sourceType.value(3)).prop("num_mort_satisfied") map {
+      parseNonEmpty[Int](sourceType.getIndex(0)).prop("num_mort_charges") and
+        parseNonEmpty[Int](sourceType.getIndex(1)).prop("num_mort_outstanding") and
+        parseNonEmpty[Int](sourceType.getIndex(2)).prop("num_mort_part_satisfied") and
+        parseNonEmpty[Int](sourceType.getIndex(3)).prop("num_mort_satisfied") map {
           case (numCharges, outstanding, partSatisfied, mortSatisfied) => {
             new Mortgages(numCharges, outstanding, partSatisfied, mortSatisfied)
           }
@@ -87,10 +86,10 @@ case class SICCode(
 object SICCode {
   implicit object SICCodeParser extends CsvParser[SICCode] {
     override def extract(sourceType: Seq[String]): Nel[SICCode] = {
-      parse[String](sourceType.value(0)).prop("sic_text_1") and
-        parse[String](sourceType.value(1)).prop("sic_text_2") and
-        parse[String](sourceType.value(2)).prop("sic_text_3") and
-        parse[String](sourceType.value(3)).prop("sic_text_4") map(_.as[SICCode])
+      parse[String](sourceType.getIndex(0)).prop("sic_text_1") and
+        parse[String](sourceType.getIndex(1)).prop("sic_text_2") and
+        parse[String](sourceType.getIndex(2)).prop("sic_text_3") and
+        parse[String](sourceType.getIndex(3)).prop("sic_text_4") map(_.as[SICCode])
     }
   }
 }
@@ -103,8 +102,8 @@ case class LimitedPartnerships(
 object LimitedPartnerships {
   implicit object SICCodeParser extends CsvParser[LimitedPartnerships] {
     override def extract(sourceType: Seq[String]): Nel[LimitedPartnerships] = {
-      parse[Int](sourceType.value(0)).prop("num_gen_partners") and
-        parse[Int](sourceType.value(1)).prop("num_lim_partners") map(_.as[LimitedPartnerships])
+      parse[Int](sourceType.getIndex(0)).prop("num_gen_partners") and
+        parse[Int](sourceType.getIndex(1)).prop("num_lim_partners") map(_.as[LimitedPartnerships])
     }
   }
 }
@@ -117,8 +116,8 @@ case class PreviousName(
 object PreviousName {
   implicit object PreviousNameParser extends CsvParser[PreviousName] {
     override def extract(sourceType: Seq[String]): Nel[PreviousName] = {
-      parse[String](sourceType.value(0)).prop("condate") and
-        parse[String](sourceType.value(1)).prop("company_name") map(_.as[PreviousName])
+      parse[String](sourceType.getIndex(0)).prop("condate") and
+        parse[String](sourceType.getIndex(1)).prop("company_name") map(_.as[PreviousName])
     }
   }
 }
@@ -137,14 +136,14 @@ case class RegistrationAddress(
 object RegistrationAddress {
   implicit object RegistrationAddressParser extends CsvParser[RegistrationAddress] {
     override def extract(sourceType: Seq[String]): Nel[RegistrationAddress] = {
-      parseNonEmpty[String](sourceType.value(0)).prop("care_of") and
-        parseNonEmpty[String](sourceType.value(1)).prop("po_box") and
-        parse[String](sourceType.value(2)).prop("address_line_1") and
-        parse[String](sourceType.value(3)).prop("address_line_2") and
-        parseNonEmpty[String](sourceType.value(4)).prop("post_town") and
-        parseNonEmpty[String](sourceType.value(5)).prop("county") and
-        parseNonEmpty[String](sourceType.value(6)).prop("country") and
-        parseNonEmpty[String](sourceType.value(7)).prop("postcode") map {tp => tp.as[RegistrationAddress]}
+      parseNonEmpty[String](sourceType.getIndex(0)).prop("care_of") and
+        parseNonEmpty[String](sourceType.getIndex(1)).prop("po_box") and
+        parse[String](sourceType.getIndex(2)).prop("address_line_1") and
+        parse[String](sourceType.getIndex(3)).prop("address_line_2") and
+        parseNonEmpty[String](sourceType.getIndex(4)).prop("post_town") and
+        parseNonEmpty[String](sourceType.getIndex(5)).prop("county") and
+        parseNonEmpty[String](sourceType.getIndex(6)).prop("country") and
+        parseNonEmpty[String](sourceType.getIndex(7)).prop("postcode") map {tp => tp.as[RegistrationAddress]}
     }
   }
 }
@@ -200,14 +199,14 @@ case class CompaniesHouseRecord(
 object CompaniesHouseRecord {
   implicit object CompaniesHouseRecordParser extends CsvParser[CompaniesHouseRecord] {
     override def extract(source: Seq[String]): ValidatedNel[String, CompaniesHouseRecord] = {
-      parse[String](source.value(1)).prop("id") and
-        parse[String](source.value(2)).prop("company_name") and
-        parse[String](source.value(3)).prop("company_number") and
-        parse[String](source.value(4)).prop("company_category") and
-        parse[String](source.value(5)).prop("company_status") and
-        parse[String](source.value(6)).prop("country_of_origin") and
-        parseNonEmpty[DateTime](source.value(7)).prop("dissolution_date") and
-        parseNonEmpty[DateTime](source.value(8)).prop("incorporation_date") and
+      parse[String](source.getIndex(1)).prop("id") and
+        parse[String](source.getIndex(2)).prop("company_name") and
+        parse[String](source.getIndex(3)).prop("company_number") and
+        parse[String](source.getIndex(4)).prop("company_category") and
+        parse[String](source.getIndex(5)).prop("company_status") and
+        parse[String](source.getIndex(6)).prop("country_of_origin") and
+        parseNonEmpty[DateTime](source.getIndex(7)).prop("dissolution_date") and
+        parseNonEmpty[DateTime](source.getIndex(8)).prop("incorporation_date") and
         CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts")
 
     }
