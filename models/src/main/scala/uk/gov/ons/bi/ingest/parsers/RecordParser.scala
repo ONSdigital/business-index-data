@@ -1,11 +1,11 @@
 package uk.gov.ons.bi.ingest.parsers
 
-import com.outworkers.util.validators.Nel
+import com.outworkers.util.validators.dsl.Nel
 
 trait RecordParser[RecordType] {
   type SourceType
 
-  def extract(sourceType: SourceType): Nel[RecordType]
+  def extract(source: SourceType): Nel[RecordType]
 }
 
 object RecordParser {

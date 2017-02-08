@@ -1,6 +1,6 @@
 lazy val Versions = new {
   val phantom = "2.1.2"
-  val util = "0.28.0"
+  val util = "0.28.1"
   val elastic4s = "2.3.1"
   val spark = "1.6.0"
   val elasticSearchSpark = "2.4.0"
@@ -8,11 +8,12 @@ lazy val Versions = new {
   val scallop = "0.9.5"
   val joda = "2.9.4"
   val jodaConvert = "1.8.1"
-  val shapeless = "2.3.1"
+  val shapeless = "2.3.1" 
 }
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
+    Resolver.bintrayRepo("outworkers", "oss-releases"),
     "splunk" at "http://splunk.artifactoryonline.com/splunk/ext-releases-local"
   ),
   scalacOptions in ThisBuild ++= Seq(
@@ -72,8 +73,8 @@ lazy val models = (project in file("models"))
       "joda-time" %  "joda-time" % Versions.joda,
       "org.joda" %  "joda-convert" % Versions.jodaConvert,
       "com.chuusai" %% "shapeless" % Versions.shapeless,
-      "com.outworkers" %% "util-parsers" % Versions.util,
-      "com.outworkers" %% "util-validators" % Versions.util,
+      "com.outworkers" %% "util-parsers-cats" % Versions.util,
+      "com.outworkers" %% "util-validators-cats" % Versions.util,
       "com.outworkers" %% "util-testing" % Versions.util % Test
     )
   ).enablePlugins(CrossPerProjectPlugin)
