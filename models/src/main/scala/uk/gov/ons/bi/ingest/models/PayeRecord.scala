@@ -1,6 +1,8 @@
 package uk.gov.ons.bi.ingest.models
 
 import org.joda.time.DateTime
+import uk.gov.ons.bi.ingest.parsers._
+import com.outworkers.util.validators.dsl.Nel
 
 case class Address(
   line_1: String,
@@ -38,8 +40,8 @@ case class PayeRecord(
 }
 
 object PayeRecord {
-  implicit object PayeRecordDelimiter extends OffsetProvider[PayeRecord] {
-    override def parser: OffsetParser = OffsetParser(
+  implicit object PayeRecordDelimiter extends OffsetParser[PayeRecord] {
+    override def parser: OffsetFormat = OffsetFormat(
       "emp_stats_rec_id" offset 1 --> 3,
       "district_number" offset 4 --> 12,
       "employer_reference" offset 14 --> 17,
@@ -72,5 +74,7 @@ object PayeRecord {
       "scheme_cancelled_date" offset 85 --> 189,
       "scheme_reopened_date" offset 190 --> 219
     )
+
+    override def extract(source: Map[String, String]): Nel[PayeRecord] = ???
   }
 }

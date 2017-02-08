@@ -1,10 +1,16 @@
 package uk.gov.ons.bi.ingest
 
+import cats.data.Validated.Valid
+import cats.data.ValidatedNel
+import com.outworkers.util.catsparsers.CatsParser
 import shapeless.Generic
-import com.outworkers.util.validators.Nel
+import com.outworkers.util.validators.dsl.Nel
 
 package object parsers {
 
+  implicit object StringParser extends CatsParser[String] {
+    override def parse(str: String): ValidatedNel[String, String] = Valid(str)
+  }
 
   implicit class NumDsl(val num: Int) extends AnyVal {
     def -->(end: Int): OffsetDelimiter = OffsetDelimiter(num, end)
@@ -35,10 +41,12 @@ package object parsers {
     * @tparam T The type of the object to augment with the as method.
     */
   implicit class TpAs[T](val obj: T) extends AnyVal {
-    def as[Caster](implicit gen: Generic.Aux[T, Caster]) = gen to obj
+    def as[Caster <: Product](implicit gen: TupleGeneric.Aux[Caster, T]) = gen from obj
   }
 
   implicit class TraversableOps[T](val col: Seq[T]) extends AnyVal {
     def value(index: Int): Option[T] = if (col.isDefinedAt(index)) Some(col(index)) else None
   }
+
+
 }

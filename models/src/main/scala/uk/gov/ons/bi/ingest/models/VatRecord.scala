@@ -1,5 +1,9 @@
 package uk.gov.ons.bi.ingest.models
 
+import org.joda.time.DateTime
+import uk.gov.ons.bi.ingest.parsers._
+import com.outworkers.util.validators.dsl.Nel
+
 /**
   * LVO code	1	3
   * VAT registration number	4	12
@@ -50,8 +54,9 @@ case class VatRecord(
 )
 
 object VatRecord {
-  implicit object VatRecordDelimiter extends OffsetProvider[VatRecord] {
-    override def parser: OffsetParser = OffsetParser(
+  implicit object VatRecordDelimiter extends OffsetParser[VatRecord] {
+
+    override def parser: OffsetFormat = OffsetFormat(
       "LOV code" offset 1 --> 3,
       "VAT registration number" offset 4 --> 12,
       "Trade class" offset 14 --> 17,
@@ -79,5 +84,7 @@ object VatRecord {
       "Address 5" offset 310 --> 339,
       "Postcode" offset 340 --> 347
     )
+
+    override def extract(source: Map[String, String]): Nel[VatRecord] = ???
   }
 }

@@ -23,7 +23,7 @@ object Accounts {
         parse[String](sourceType(1)).prop("accounts_ref_month") and
         parseNonEmpty[DateTime](sourceType.value(2)).prop("next_due_date") and
         parseNonEmpty[DateTime](sourceType.value(3)).prop("last_made_up_date") and
-        parseNonEmpty[String](sourceType.value(4)).prop("account_category") as[Accounts] _
+        parseNonEmpty[String](sourceType.value(4)).prop("account_category") map(_.as[Accounts])
     }
   }
 }
@@ -37,7 +37,7 @@ object Returns {
   implicit object ReturnsParser extends CsvParser[Returns] {
     override def extract(sourceType: Seq[String]): Nel[Returns] = {
       parse[DateTime](sourceType.head).prop("next_due_date") and
-        parseNonEmpty[DateTime](sourceType.value(1)).prop("last_made_up_date") as[Returns] _
+        parseNonEmpty[DateTime](sourceType.value(1)).prop("last_made_up_date") map(_.as[Returns])
     }
   }
 }
@@ -55,7 +55,7 @@ object Mortgages {
       parseNonEmpty[Int](sourceType.value(0)).prop("num_mort_charges") and
         parseNonEmpty[Int](sourceType.value(1)).prop("num_mort_outstanding") and
         parseNonEmpty[Int](sourceType.value(2)).prop("num_mort_part_satisfied") and
-        parseNonEmpty[Int](sourceType.value(3)).prop("num_mort_satisfied") as[Mortgages] _
+        parseNonEmpty[Int](sourceType.value(3)).prop("num_mort_satisfied") map(_.as[Mortgages])
     }
   }
 }
@@ -73,7 +73,7 @@ object SICCode {
       parse[String](sourceType.value(0)).prop("sic_text_1") and
         parse[String](sourceType.value(1)).prop("sic_text_2") and
         parse[String](sourceType.value(2)).prop("sic_text_3") and
-        parse[String](sourceType.value(3)).prop("sic_text_4") as[SICCode] _
+        parse[String](sourceType.value(3)).prop("sic_text_4") map(_.as[SICCode])
     }
   }
 }
@@ -87,7 +87,7 @@ object LimitedPartnerships {
   implicit object SICCodeParser extends CsvParser[LimitedPartnerships] {
     override def extract(sourceType: Seq[String]): Nel[LimitedPartnerships] = {
       parse[Int](sourceType.value(0)).prop("num_gen_partners") and
-        parse[Int](sourceType.value(1)).prop("num_lim_partners") as[LimitedPartnerships] _
+        parse[Int](sourceType.value(1)).prop("num_lim_partners") map(_.as[LimitedPartnerships])
     }
   }
 }
@@ -101,7 +101,7 @@ object PreviousName {
   implicit object PreviousNameParser extends CsvParser[PreviousName] {
     override def extract(sourceType: Seq[String]): Nel[PreviousName] = {
       parse[String](sourceType.value(0)).prop("condate") and
-        parse[String](sourceType.value(1)).prop("company_name") as[PreviousName] _
+        parse[String](sourceType.value(1)).prop("company_name") map(_.as[PreviousName])
     }
   }
 }
@@ -127,7 +127,7 @@ object RegistrationAddress {
         parseNonEmpty[String](sourceType.value(4)).prop("post_town") and
         parseNonEmpty[String](sourceType.value(5)).prop("county") and
         parseNonEmpty[String](sourceType.value(6)).prop("country") and
-        parseNonEmpty[String](sourceType.value(7)).prop("postcode") as[RegistrationAddress] _
+        parseNonEmpty[String](sourceType.value(7)).prop("postcode") map(_.as[RegistrationAddress])
     }
   }
 }
@@ -157,7 +157,7 @@ object PreviousNames {
       CsvParser[PreviousName].extract(source.slice(12, 14)).prop("previous_name_7") and
       CsvParser[PreviousName].extract(source.slice(14, 16)).prop("previous_name_8") and
       CsvParser[PreviousName].extract(source.slice(16, 18)).prop("previous_name_9") and
-      CsvParser[PreviousName].extract(source.slice(18, 20)).prop("previous_name_10") as[PreviousNames] _
+      CsvParser[PreviousName].extract(source.slice(18, 20)).prop("previous_name_10") map(_.as[PreviousNames])
     }
   }
 }
@@ -191,7 +191,7 @@ object CompaniesHouseRecord {
         parse[String](source.value(6)).prop("country_of_origin") and
         parseNonEmpty[DateTime](source.value(7)).prop("dissolution_date") and
         parseNonEmpty[DateTime](source.value(8)).prop("incorporation_date") and
-        CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts") as[CompaniesHouseRecord] _
+        CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts")
 
     }
   }
