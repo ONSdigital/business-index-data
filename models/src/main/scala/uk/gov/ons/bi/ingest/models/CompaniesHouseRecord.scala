@@ -163,7 +163,7 @@ case class PreviousNames(
 
 object PreviousNames {
   implicit object PreviousNamesParser extends CsvParser[PreviousNames] {
-    override def extract(source: Seq[String]) = {
+    override def extract(source: Seq[String]): Nel[PreviousNames] = {
       CsvParser[PreviousName].extract(source.take(2)).prop("previous_name_1") and
       CsvParser[PreviousName].extract(source.slice(2, 4)).prop("previous_name_2") and
       CsvParser[PreviousName].extract(source.slice(4, 6)).prop("previous_name_3") and
