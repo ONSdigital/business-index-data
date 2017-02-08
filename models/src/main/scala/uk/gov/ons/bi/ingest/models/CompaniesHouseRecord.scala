@@ -200,7 +200,7 @@ case class CompaniesHouseRecord(
   incorporation_date: Option[DateTime],
   accounts: Accounts,
   returns: Option[Returns],
-  sic_code: SICCode,
+  sic_code: Option[SICCode],
   limitedPartnerships: LimitedPartnerships,
   uri: Option[String],
   previous_names: PreviousNames
@@ -209,21 +209,39 @@ case class CompaniesHouseRecord(
 
 object CompaniesHouseRecord {
   implicit object CompaniesHouseRecordParser extends CsvParser[CompaniesHouseRecord] {
-    override def extract(source: Seq[String]): ValidatedNel[String, CompaniesHouseRecord] = {
-      parse[String](source.getIndex(1)).prop("id") and
-        parse[String](source.getIndex(2)).prop("company_name") and
-        parse[String](source.getIndex(3)).prop("company_number") and
-        parse[String](source.getIndex(4)).prop("company_category") and
-        parse[String](source.getIndex(5)).prop("company_status") and
-        parse[String](source.getIndex(6)).prop("country_of_origin") and
-        parseNonEmpty[DateTime](source.getIndex(7)).prop("dissolution_date") and
-        parseNonEmpty[DateTime](source.getIndex(8)).prop("incorporation_date") and
-        CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts") and
-        CsvParser[Returns].extractOpt(source.slice(13, 15)) and
-        CsvParser[SICCode].extractOpt(source.slice(15, 19)) and
-        CsvParser[LimitedPartnerships].extract(source.slice(19, 21)) and
-        parseNonEmpty[String](source.getIndex(22)) and
-        CsvParser[PreviousNames].extract(source.slice(22, 32))
+    override def extract(source: Seq[String]): Nel[CompaniesHouseRecord] = {
+      parse[String](source.getIndex(0)).prop("id") and
+        parse[String](source.getIndex(1)).prop("company_name") and
+        parse[String](source.getIndex(2)).prop("company_number") and
+        parse[String](source.getIndex(3)).prop("company_category") and
+        parse[String](source.getIndex(4)).prop("company_status") and
+        parse[String](source.getIndex(5)).prop("country_of_origin") and
+        parseNonEmpty[DateTime](source.getIndex(6)).prop("dissolution_date") and
+        parseNonEmpty[DateTime](source.getIndex(7)).prop("incorporation_date") and
+        CsvParser[Accounts].extract(source.slice(7, 12)).prop("accounts") and
+        CsvParser[Returns].extractOpt(source.slice(12, 14)) and
+        CsvParser[SICCode].extractOpt(source.slice(14, 18)) and
+        CsvParser[LimitedPartnerships].extract(source.slice(18, 20)) and
+        parseNonEmpty[String](source.getIndex(21)).prop("uri") and
+        CsvParser[PreviousNames].extract(source.slice(21, 31)) map {
+        case (id, name, number, cat, status, origin, dissolutionDate, incorporationDate, accounts, returns, sic, lp, uri, prev) =>
+          CompaniesHouseRecord(
+            id,
+            name,
+            number,
+            cat,
+            status,
+            origin,
+            dissolutionDate,
+            incorporationDate,
+            accounts,
+            returns,
+            sic,
+            lp,
+            uri,
+            prev
+          )
+        }
     }
   }
 }
