@@ -2,15 +2,12 @@ package uk.gov.ons.bi.ingest
 
 import cats.data.Validated.Valid
 import cats.data.ValidatedNel
-import com.outworkers.util.catsparsers.CatsParser
-import shapeless.Generic
+import com.outworkers.util.catsparsers.Parser
 import com.outworkers.util.validators.dsl.Nel
-import shapeless.ops.hlist.Tupler
-import shapeless.syntax.std.tuple._
 
 package object parsers {
 
-  implicit object StringParser extends CatsParser[String] {
+  implicit object StringParser extends Parser[String] {
     override def parse(str: String): ValidatedNel[String, String] = Valid(str)
   }
 

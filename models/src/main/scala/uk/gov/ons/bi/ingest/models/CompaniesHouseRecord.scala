@@ -172,16 +172,16 @@ case class PreviousNames(
 object PreviousNames {
   implicit object PreviousNamesParser extends CsvParser[PreviousNames] {
     override def extract(source: Seq[String]): Nel[PreviousNames] = {
-      CsvParser[PreviousName].extract(source.take(2)).prop("previous_name_1") and
-      CsvParser[PreviousName].extract(source.slice(2, 4)).prop("previous_name_2") and
-      CsvParser[PreviousName].extract(source.slice(4, 6)).prop("previous_name_3") and
-      CsvParser[PreviousName].extract(source.slice(6, 8)).prop("previous_name_4") and
-      CsvParser[PreviousName].extract(source.slice(8, 10)).prop("previous_name_5") and
-      CsvParser[PreviousName].extract(source.slice(10, 12)).prop("previous_name_6") and
-      CsvParser[PreviousName].extract(source.slice(12, 14)).prop("previous_name_7") and
-      CsvParser[PreviousName].extract(source.slice(14, 16)).prop("previous_name_8") and
-      CsvParser[PreviousName].extract(source.slice(16, 18)).prop("previous_name_9") and
-      CsvParser[PreviousName].extract(source.slice(18, 20)).prop("previous_name_10") map {
+      CsvParser[PreviousName].extractOpt(source.take(2)).prop("previous_name_1") and
+      CsvParser[PreviousName].extractOpt(source.slice(2, 4)).prop("previous_name_2") and
+      CsvParser[PreviousName].extractOpt(source.slice(4, 6)).prop("previous_name_3") and
+      CsvParser[PreviousName].extractOpt(source.slice(6, 8)).prop("previous_name_4") and
+      CsvParser[PreviousName].extractOpt(source.slice(8, 10)).prop("previous_name_5") and
+      CsvParser[PreviousName].extractOpt(source.slice(10, 12)).prop("previous_name_6") and
+      CsvParser[PreviousName].extractOpt(source.slice(12, 14)).prop("previous_name_7") and
+      CsvParser[PreviousName].extractOpt(source.slice(14, 16)).prop("previous_name_8") and
+      CsvParser[PreviousName].extractOpt(source.slice(16, 18)).prop("previous_name_9") and
+      CsvParser[PreviousName].extractOpt(source.slice(18, 20)).prop("previous_name_10") map {
         case (pn1, pn2, pn3, pn4, pn5, pn6, pn7, pn8, pn9, pn10) =>
           PreviousNames(pn1, pn2, pn3, pn4, pn5, pn6, pn7, pn8, pn9, pn10)
       }
@@ -218,8 +218,12 @@ object CompaniesHouseRecord {
         parse[String](source.getIndex(6)).prop("country_of_origin") and
         parseNonEmpty[DateTime](source.getIndex(7)).prop("dissolution_date") and
         parseNonEmpty[DateTime](source.getIndex(8)).prop("incorporation_date") and
-        CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts")
-
+        CsvParser[Accounts].extract(source.slice(8, 13)).prop("accounts") and
+        CsvParser[Returns].extractOpt(source.slice(13, 15)) and
+        CsvParser[SICCode].extractOpt(source.slice(15, 19)) and
+        CsvParser[LimitedPartnerships].extract(source.slice(19, 21)) and
+        parseNonEmpty[String](source.getIndex(22)) and
+        CsvParser[PreviousNames].extract(source.slice(22, 32))
     }
   }
 }
