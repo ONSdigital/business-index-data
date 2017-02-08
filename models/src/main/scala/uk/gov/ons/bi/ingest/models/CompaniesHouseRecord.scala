@@ -47,7 +47,10 @@ object Returns {
   implicit object ReturnsParser extends CsvParser[Returns] {
     override def extract(sourceType: Seq[String]): Nel[Returns] = {
       parse[DateTime](sourceType.head).prop("next_due_date") and
-        parseNonEmpty[DateTime](sourceType.value(1)).prop("last_made_up_date") map(_.as[Returns])
+        parseNonEmpty[DateTime](sourceType.value(1)).prop("last_made_up_date") map { tp =>
+        val gen = TupleGeneric[Returns]
+        gen from tp
+      }
     }
   }
 }
@@ -65,7 +68,11 @@ object Mortgages {
       parseNonEmpty[Int](sourceType.value(0)).prop("num_mort_charges") and
         parseNonEmpty[Int](sourceType.value(1)).prop("num_mort_outstanding") and
         parseNonEmpty[Int](sourceType.value(2)).prop("num_mort_part_satisfied") and
-        parseNonEmpty[Int](sourceType.value(3)).prop("num_mort_satisfied") map(_.as[Mortgages])
+        parseNonEmpty[Int](sourceType.value(3)).prop("num_mort_satisfied") map {
+          case (numCharges, outstanding, partSatisfied, mortSatisfied) => {
+            new Mortgages(numCharges, outstanding, partSatisfied, mortSatisfied)
+          }
+        }
     }
   }
 }
