@@ -43,7 +43,7 @@ package object parsers {
     * @tparam T The type of the object to augment with the as method.
     */
   implicit class TpAs[T](val obj: T) extends AnyVal {
-    def as[Caster <: Product](implicit gen: TupleGeneric.Aux[Caster, T]) = gen from obj
+    //def as[Caster <: Product](implicit gen: TupleGeneric.Aux[Caster, T]) = gen from obj
   }
 
   implicit class TraversableOps[T](val col: Seq[T]) extends AnyVal {

@@ -6,7 +6,6 @@ import uk.gov.ons.bi.ingest.parsers.CsvParser
 import com.outworkers.util.catsparsers._
 import com.outworkers.util.validators.dsl._
 import uk.gov.ons.bi.ingest.parsers._
-import TupleGeneric._
 
 case class Accounts(
   accounts_ref_day: String,
@@ -47,8 +46,8 @@ object Returns {
   implicit object ReturnsParser extends CsvParser[Returns] {
     override def extract(sourceType: Seq[String]): Nel[Returns] = {
       parse[DateTime](sourceType.getIndex(0)).prop("next_due_date") and
-        parseNonEmpty[DateTime](sourceType.getIndex(1)).prop("last_made_up_date") map { case (nextDate, lastDate) =>
-          new Returns(nextDate, lastDate)
+        parseNonEmpty[DateTime](sourceType.getIndex(1)).prop("last_made_up_date") map {
+          case (nextDate, lastDate) => new Returns(nextDate, lastDate)
       }
     }
   }
@@ -89,7 +88,9 @@ object SICCode {
       parse[String](sourceType.getIndex(0)).prop("sic_text_1") and
         parse[String](sourceType.getIndex(1)).prop("sic_text_2") and
         parse[String](sourceType.getIndex(2)).prop("sic_text_3") and
-        parse[String](sourceType.getIndex(3)).prop("sic_text_4") map(_.as[SICCode])
+        parse[String](sourceType.getIndex(3)).prop("sic_text_4") map {
+          case (sicText1, sicText2, sicText3, sicText4) => SICCode(sicText1, sicText2, sicText3, sicText4)
+        }
     }
   }
 }
@@ -103,7 +104,9 @@ object LimitedPartnerships {
   implicit object SICCodeParser extends CsvParser[LimitedPartnerships] {
     override def extract(sourceType: Seq[String]): Nel[LimitedPartnerships] = {
       parse[Int](sourceType.getIndex(0)).prop("num_gen_partners") and
-        parse[Int](sourceType.getIndex(1)).prop("num_lim_partners") map(_.as[LimitedPartnerships])
+        parse[Int](sourceType.getIndex(1)).prop("num_lim_partners") map {
+          case (numGen, numLim) => LimitedPartnerships(numGen, numLim)
+        }
     }
   }
 }
@@ -117,7 +120,9 @@ object PreviousName {
   implicit object PreviousNameParser extends CsvParser[PreviousName] {
     override def extract(sourceType: Seq[String]): Nel[PreviousName] = {
       parse[String](sourceType.getIndex(0)).prop("condate") and
-        parse[String](sourceType.getIndex(1)).prop("company_name") map(_.as[PreviousName])
+        parse[String](sourceType.getIndex(1)).prop("company_name") map {
+          case (condate, companyName) => PreviousName(condate, companyName)
+        }
     }
   }
 }
@@ -143,7 +148,10 @@ object RegistrationAddress {
         parseNonEmpty[String](sourceType.getIndex(4)).prop("post_town") and
         parseNonEmpty[String](sourceType.getIndex(5)).prop("county") and
         parseNonEmpty[String](sourceType.getIndex(6)).prop("country") and
-        parseNonEmpty[String](sourceType.getIndex(7)).prop("postcode") map {tp => tp.as[RegistrationAddress]}
+        parseNonEmpty[String](sourceType.getIndex(7)).prop("postcode") map {
+          case (careOf, poBox, al1, al2, postTown, county, country, postcode) =>
+            RegistrationAddress(careOf, poBox, al1, al2, postTown, county, country, postcode)
+        }
     }
   }
 }
