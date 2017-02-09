@@ -68,7 +68,7 @@ lazy val models = (project in file("models"))
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,
-      "org.scalatest" %% "scalatest" % "3.0.1"
+      "org.scalatest" %% "scalatest" % "3.0.0"
 
     )
   ).enablePlugins(CrossPerProjectPlugin)
