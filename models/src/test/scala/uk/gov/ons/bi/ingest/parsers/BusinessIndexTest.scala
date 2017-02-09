@@ -4,16 +4,14 @@ import org.scalatest.FlatSpec
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.helpers.IOHelper._
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
-import uk.gov.ons.bi.ingest.process.{CompanyLinker, MapDataSource}
+import uk.gov.ons.bi.ingest.process.{BusinessLinker, MapDataSource}
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
 class BusinessIndexTest extends FlatSpec {
 
-
   "From input data" should "proper business data to be created" in {
-
 
     // read all input data
     // we need all InputData to be represented as DataSource
@@ -38,15 +36,12 @@ class BusinessIndexTest extends FlatSpec {
 
     // invoke linker class
     // and pass CSV as DataSources
-    val busObjs = new CompanyLinker().buildLink(
+    val busObjs = new BusinessLinker().buildLink(
       asMapDS(links),
       asMapDS(vatMapList),
       asMapDS(payeMapList),
       asMapDS(chMapList)
     )
-
-    busObjs.foreach(x => println(x.toCsv))
-
+    busObjs.foreach(x => assert(x.id > 0, "Id populated"))
   }
-
 }

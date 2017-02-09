@@ -7,7 +7,7 @@ import uk.gov.ons.bi.ingest.models._
   */
 
 
-class CompanyLinker {
+class BusinessLinker {
 
   def buildLink(linking: DataSource[String, LinkedRecord],
                 vat: DataSource[String, VatRecord],
