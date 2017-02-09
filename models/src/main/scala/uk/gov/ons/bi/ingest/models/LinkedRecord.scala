@@ -10,12 +10,10 @@ import scala.collection.generic.CanBuildFrom
 }
  */
 
-case class LinkedRecord(
-  ubrn: String,
-  paye: List[String],
-  ch: List[String],
-  vat: List[String]
-)
+case class LinkedRecord(id: String, paye: List[String], ch: List[String], vat: List[String]) {
+  override def toString: String = s"$id - CH: $ch, PAYE - $paye, VAT - $vat"
+}
+
 
 object LinkedRecord {
 

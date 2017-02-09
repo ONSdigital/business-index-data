@@ -4,12 +4,13 @@ language: scala
 before_script: travis_retry sbt ++$TRAVIS_SCALA_VERSION update
 
 script:
-  sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport coverageAggregate coveralls
+  sbt ++$TRAVIS_SCALA_VERSION test
+# TODO: setup artifactory  sbt ++$TRAVIS_SCALA_VERSION coverage test coverageReport coverageAggregate coveralls
 
 after_succes: ./build/tag.sh
 
 scala:
-  - 2.100.6
+  - 2.10.6
   - 2.11.8
 
 jdk:

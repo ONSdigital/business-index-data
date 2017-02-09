@@ -2,6 +2,7 @@ package uk.gov.ons.bi.ingest
 
 import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri}
 import com.typesafe.config.ConfigFactory
+import org.apache.spark.rdd.RDD
 import org.elasticsearch.common.settings.Settings
 import uk.gov.ons.bi.ingest.writers.indexes._
 

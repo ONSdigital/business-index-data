@@ -69,7 +69,6 @@ lazy val models = (project in file("models"))
     crossScalaVersions := Seq("2.10.6", "2.11.8"),
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
-      "org.joda" %  "joda-convert" % Versions.jodaConvert,
       "org.json4s" %% "json4s-native" % Versions.json4s,
       "com.outworkers" %% "util-parsers-cats" % Versions.util,
       "com.outworkers" %% "util-validators-cats" % Versions.util,

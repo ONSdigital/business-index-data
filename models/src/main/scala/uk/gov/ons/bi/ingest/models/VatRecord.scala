@@ -4,6 +4,28 @@ import org.joda.time.DateTime
 import uk.gov.ons.bi.ingest.parsers._
 import com.outworkers.util.validators.dsl.Nel
 
+
+case class VatRecord2(
+   entref: String,
+   vatref: String,
+   deathcode: String,
+   birthdate: String,
+   deathdate: String,
+   sic92: String,
+   turnover: String,
+   turnover_date: String,
+   record_type: String,
+   legalstatus: String,
+   actiondate: String,
+   crn: String,
+   marker: String,
+   addressref: String,
+   inqcode: String,
+   name: PayeName,
+   tradStyle: TradStyle,
+   address: Address
+)
+
 /**
   * LVO code	1	3
   * VAT registration number	4	12
@@ -32,7 +54,7 @@ import com.outworkers.util.validators.dsl.Nel
   *Address 5	310	339
   *Postcode 	340	347
   */
-case class VatRecord(
+@deprecated case class VatRecord(
   lov_code: String,
   vat_registration_number: String,
   trade_class: String,

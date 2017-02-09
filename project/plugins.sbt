@@ -10,9 +10,10 @@ addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-doge" % "0.1.5")
 
-addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.5.0")
-
-addSbtPlugin("org.scoverage" %% "sbt-coveralls" % "1.1.0")
+// TODO: setup artifactory
+//addSbtPlugin("org.scoverage" %% "sbt-scoverage" % "1.5.0")
+//
+//addSbtPlugin("org.scoverage" %% "sbt-coveralls" % "1.1.0")
 
 // https://github.com/sbt/sbt/issues/1931
 libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.21"
