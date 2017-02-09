@@ -36,6 +36,8 @@ class BusinessIndexTest extends FlatSpec {
 
     def asMapDS[T](map: Map[String, T]) = new MapDataSource(map)
 
+    // invoke linker class
+    // and pass CSV as DataSources
     val busObjs = new CompanyLinker().buildLink(
       asMapDS(links),
       asMapDS(vatMapList),

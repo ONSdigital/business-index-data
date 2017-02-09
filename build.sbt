@@ -47,7 +47,7 @@ lazy val businessIndex = (project in file("."))
 lazy val sparkIngestion = (project in file("ingestion"))
   .settings(commonSettings: _*)
   .settings(
-    crossScalaVersions := Seq("2.10.6"),
+    // FIXME: crossScalaVersions := Seq("2.10.6"),
     libraryDependencies ++= Seq(
       "org.json4s" %% "json4s-native" % Versions.json4s,
       "org.rogach" %% "scallop" % Versions.scallop,
@@ -64,7 +64,7 @@ lazy val sparkIngestion = (project in file("ingestion"))
 lazy val models = (project in file("models"))
   .settings(commonSettings: _*)
   .settings(
-    crossScalaVersions := Seq("2.10.6", "2.11.8"),
+    // FIXME: crossScalaVersions := Seq("2.10.6", "2.11.8"),
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,

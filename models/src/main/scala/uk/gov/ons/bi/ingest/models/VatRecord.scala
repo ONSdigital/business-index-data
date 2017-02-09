@@ -1,6 +1,6 @@
 package uk.gov.ons.bi.ingest.models
 
-case class VatRecord2(
+case class VatRecord(
    entref: String,
    vatref: String,
    deathcode: String,

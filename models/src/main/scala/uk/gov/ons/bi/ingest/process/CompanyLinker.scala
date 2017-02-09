@@ -10,7 +10,7 @@ import uk.gov.ons.bi.ingest.models._
 class CompanyLinker {
 
   def buildLink(linking: DataSource[String, LinkedRecord],
-                vat: DataSource[String, VatRecord2],
+                vat: DataSource[String, VatRecord],
                 paye: DataSource[String, PayeRecord2],
                 ch: DataSource[String, CompaniesHouseRecord]): DataSource[String, BusinessIndex] = {
     linking.map { x => {
@@ -29,13 +29,12 @@ class CompanyLinker {
         turnover = extractTurnover,
         employmentBand = extractExploymentBand
       )
-
     }
-
     }
   }
 
-  def extractCompanyName()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])) = {
+  // TODO: cleanup this triple tuple
+  def extractCompanyName()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])) = {
     cvp match {
       case (Some(ch), _, _) => ch.company_name
       case (None, Some(vt), _) => vt.name.toString
@@ -44,20 +43,20 @@ class CompanyLinker {
     }
   }
 
-  def extractUprn()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])): String = {
-    "" // TODO: suppose to come from address index
+  def extractUprn()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): Long = {
+    -1L // TODO: suppose to come from address index
   }
 
 
-  def extractIndustryCode()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])): String = {
+  def extractIndustryCode()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): Long = {
     cvp match {
-      case (_, Some(vt), _) => vt.inqcode
-      case (_, None, Some(py)) => py.inqcode
-      case _ => ""
+      case (_, Some(vt), _) => vt.inqcode.toLong
+      case (_, None, Some(py)) => py.inqcode.toLong
+      case _ => -1
     }
   }
 
-  def extractLegalStatus()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])): String = {
+  def extractLegalStatus()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
     cvp match {
       case (Some(c1), _, _) => c1.company_status // TODO: company status is legal status ?
       case (None, Some(vt), _) => vt.legalstatus
@@ -66,21 +65,21 @@ class CompanyLinker {
     }
   }
 
-  def extractTradingStatus()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])): String = {
+  def extractTradingStatus()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
     cvp match {
       case (Some(c1), _, _) => c1.company_status
       case _ => ""
     }
   }
 
-  def extractTurnover()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])): String = {
+  def extractTurnover()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
     cvp match {
       case (_, Some(vt), _) => vt.turnover
       case _ => ""
     }
   }
 
-  def extractExploymentBand()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord2], Option[PayeRecord2])): String = {
+  def extractExploymentBand()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
     cvp match {
       case (_, _, Some(py)) => py.employer_cat
       case _ => ""

@@ -1,6 +1,6 @@
 package uk.gov.ons.bi.ingest.builder
 
-import uk.gov.ons.bi.ingest.models.VatRecord2
+import uk.gov.ons.bi.ingest.models.VatRecord
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
@@ -11,8 +11,8 @@ object VATBuilder {
 
 }
 
-class VATBuilder(val map: Map[String, String]) extends RecordBuilder[VatRecord2] {
-  override def build: VatRecord2 = VatRecord2(
+class VATBuilder(val map: Map[String, String]) extends RecordBuilder[VatRecord] {
+  override def build: VatRecord = VatRecord(
     entref = map("entref"),
     vatref = map("vatref"),
     deathcode = map("deathcode"),

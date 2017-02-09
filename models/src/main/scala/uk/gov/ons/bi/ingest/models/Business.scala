@@ -14,11 +14,13 @@ case class Business(
   companiesHouse: Option[CompaniesHouseRecord]
 )
 
+
+// fixme: the same class exists in bi-api
 case class BusinessIndex(
-  id: Int,
+  id: Long,
   name: String,
-  uprn: String,
-  industryCode: String,
+  uprn: Long,
+  industryCode: Long,
   legalStatus: String,
   tradingStatus: String,
   turnover: String,
