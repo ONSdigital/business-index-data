@@ -10,7 +10,7 @@ object Hmrc {
 case class Business(
   charitiesCommission: Option[CharitiesCommissionEntry],
   vatRecord: Option[Hmrc.VatRecord],
-  payeRecord: Option[PayeRecord],
+  payeRecord: Option[PayeRecord2],
   companiesHouse: Option[CompaniesHouseRecord]
 )
 

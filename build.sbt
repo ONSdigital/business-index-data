@@ -11,7 +11,6 @@ lazy val Versions = new {
 
 lazy val commonSettings = Seq(
   resolvers ++= Seq(
-    Resolver.bintrayRepo("outworkers", "oss-releases"),
     "splunk" at "http://splunk.artifactoryonline.com/splunk/ext-releases-local"
   ),
   scalacOptions in ThisBuild ++= Seq(
@@ -56,8 +55,7 @@ lazy val sparkIngestion = (project in file("ingestion"))
       "org.apache.spark" %% "spark-core" % Versions.spark,
       "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
         ExclusionRule(organization = "javax.servlet")
-      },
-      "com.outworkers" %% "util-testing" % Versions.util % Test
+      }
     )
   ).dependsOn(
     models
@@ -70,8 +68,7 @@ lazy val models = (project in file("models"))
     libraryDependencies ++= Seq(
       "joda-time" %  "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,
-      "com.outworkers" %% "util-parsers-cats" % Versions.util,
-      "com.outworkers" %% "util-validators-cats" % Versions.util,
-      "com.outworkers" %% "util-testing" % Versions.util % Test
+      "org.scalatest" %% "scalatest" % "3.0.1"
+
     )
   ).enablePlugins(CrossPerProjectPlugin)
