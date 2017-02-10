@@ -2,6 +2,8 @@ package uk.gov.ons.bi.ingest.process
 
 import java.io.File
 
+import com.typesafe.config.ConfigFactory
+import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
@@ -16,9 +18,15 @@ import scala.io.Source
   */
 object BusinessLinkerApp extends App {
 
-  // -Dout.path=/Users/Volodymyr.Glushak/git/business-index-data/models/src/test/resources/OUT.json -Dlinking.path=/Users/Volodymyr.Glushak/git/business-index-data/models/src/test/resources/linking.json -Dch.path=/Users/Volodymyr.Glushak/git/business-index-data/models/src/test/resources/CH_Output.csv -Dpaye.path=/Users/Volodymyr.Glushak/git/business-index-data/models/src/test/resources/PAYE_Output.csv -Dvat.path=/Users/Volodymyr.Glushak/git/business-index-data/models/src/test/resources/VAT_Output.csv    models/run
+  // elastic search part
 
-  def getSys(name: String) = sys.props.getOrElse(name, sys.error(s"System var $name missed"))
+  val config = BiConfigManager.envConf(ConfigFactory.load())
+
+  val elasticClient = ElasticClientBuilder.build(config)
+
+  val elasticImporter = new ElasticImporter(elasticClient)
+
+  def getProp(name: String) = config.getString(name)
 
   def readFile(filename: String) = Source.fromFile(filename).getLines.toSeq
 
@@ -33,12 +41,12 @@ object BusinessLinkerApp extends App {
     try { op(p) } finally { p.close() }
   }
 
-  val chPath = getSys("ch.path")
-  val payePath = getSys("paye.path")
-  val vatPath = getSys("vat.path")
-  val linkingPath = getSys("linking.path")
+  val chPath = getProp("ch.path")
+  val payePath = getProp("paye.path")
+  val vatPath = getProp("vat.path")
+  val linkingPath = getProp("linking.path")
 
-  val outPath = getSys("out.path")
+  val outPath = getProp("out.path")
 
   // read all input data
   // we need all InputData to be represented as DataSource
@@ -78,5 +86,7 @@ object BusinessLinkerApp extends App {
     busObjs.foreach(x => writer.println(x.toCsv))
 
   }
+
+  elasticImporter.loadBusinessIndex("bi-local", busObjs)
 
 }
