@@ -3,12 +3,16 @@ package uk.gov.ons.bi.ingest.process
 import java.io.File
 
 import com.typesafe.config.ConfigFactory
-import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
+import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.io.Source
+import scala.util.{Failure, Success, Try}
 
 /**
   *
@@ -38,7 +42,11 @@ object BusinessLinkerApp extends App {
 
   def printToFile(name: String)(op: java.io.PrintWriter => Unit) {
     val p = new java.io.PrintWriter(new File(name))
-    try { op(p) } finally { p.close() }
+    try {
+      op(p)
+    } finally {
+      p.close()
+    }
   }
 
   val chPath = getProp("ch.path")
@@ -87,6 +95,21 @@ object BusinessLinkerApp extends App {
 
   }
 
-  elasticImporter.loadBusinessIndex("bi-local", busObjs)
+  val biName = getProp("elasticsearch.bi.name")
+//  val resFutures = elasticImporter.initBiIndex(biName) flatMap { x =>
+//    println(s"Index created with results $x")
+//    elasticImporter.loadBusinessIndex(biName, busObjs)
+//  }
+  val resFutures = elasticImporter.loadBusinessIndex(biName, busObjs)
+  // blocking, for test purposes only
+  Try(Await.result(resFutures, 10.seconds)) match {
+    case Success(ress) =>
+      ress.foreach(r => {
+        println(r.original)
+        println(s"${r.id} -> created: ${r.isCreated}")
+      })
+      println(s"Successfully imported data")
+    case Failure(err) => println("Unable to import data" + err)
+  }
 
 }
