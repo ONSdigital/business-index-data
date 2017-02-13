@@ -62,17 +62,11 @@ object BusinessLinkerApp extends App {
   // read all input data
   // we need all InputData to be represented as DataSource
 
-  val chMapList = csvToMap(readFile(chPath)).map(chCmp =>
-    CHBuilder.companyHouseFromMap(chCmp)
-  ).map(ch => ch.company_number -> ch).toMap
+  val chMapList = csvToMap(readFile(chPath)).map(CHBuilder.companyHouseFromMap).map(ch => ch.company_number -> ch).toMap
 
-  val payeMapList = csvToMap(readFile(payePath)).map(payeRec =>
-    PayeBuilder.payeFromMap(payeRec)
-  ).map(py => py.entref -> py).toMap
+  val payeMapList = csvToMap(readFile(payePath)).map(PayeBuilder.payeFromMap).map(py => py.entref -> py).toMap
 
-  val vatMapList = csvToMap(readFile(vatPath)).map(vatRec =>
-    VATBuilder.vatFromMap(vatRec)
-  ).map(vt => vt.entref -> vt).toMap
+  val vatMapList = csvToMap(readFile(vatPath)).map(VATBuilder.vatFromMap).map(vt => vt.entref -> vt).toMap
 
   val links = LinkedFileParser.parse(readFile(linkingPath).mkString("\n")).head.map { lk =>
     lk.id -> lk

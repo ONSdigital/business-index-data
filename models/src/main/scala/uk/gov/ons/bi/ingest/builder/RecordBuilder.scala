@@ -11,13 +11,9 @@ trait RecordBuilder[T] {
 
   def build: T
 
-
-
-
   // util methods below that are used in more than one type of records
-
   protected def multiLineNameFromMap = PayeName(
-    nameline1 = map("nameline1"),
+    nameline1 = map.getOrElse("nameline", map("nameline1")), // PAYE and VAT files has different header
     nameline2 = map("nameline2"),
     nameline3 = map("nameline3")
   )
