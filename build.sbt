@@ -11,6 +11,10 @@ lazy val Versions = new {
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.11.8",
+
+  // next properties set required for sbt-assembly plugin,
+  // whe it finds two classes with same name in different JARs it does not know what to do
+  // we're defining merge strategy for problematic classes (mostly it's spark deps)
   assemblyMergeStrategy in assembly := {
     case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
     case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
