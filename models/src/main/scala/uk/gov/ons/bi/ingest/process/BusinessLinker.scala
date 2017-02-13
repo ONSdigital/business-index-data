@@ -5,8 +5,6 @@ import uk.gov.ons.bi.ingest.models._
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
-
-
 class BusinessLinker {
 
   def buildLink(linking: DataSource[String, LinkedRecord],

@@ -22,7 +22,7 @@ trait DataSource[I, T] {
 
 }
 
-class MapDataSource[I, T](data: Map[I, T]) extends DataSource[I, T] {
+class MapDataSource[I, T](val data: Map[I, T]) extends DataSource[I, T] {
 
   override def getById(id: I): Option[T] = data.get(id)
 
