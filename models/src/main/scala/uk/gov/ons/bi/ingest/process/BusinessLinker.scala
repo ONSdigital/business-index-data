@@ -12,75 +12,76 @@ class BusinessLinker {
                 paye: DataSource[String, PayeRecord2],
                 ch: DataSource[String, CompaniesHouseRecord]): DataSource[String, BusinessIndex] = {
     linking.map { x => {
-      val compHouseRec = x.ch.flatMap(ch.getById).headOption // might be empty & ignore all records except first
-      val payeRec = x.paye.flatMap(paye.getById).headOption
-      val vatRec = x.vat.flatMap(vat.getById).headOption
-      implicit val cvp = (compHouseRec, vatRec, payeRec)
+      val compHouseRec = x.ch.flatMap(ch.getById)
+      val payeRec = x.paye.flatMap(paye.getById)
+      val vatRec = x.vat.flatMap(vat.getById)
+      val extractor = new BusinessIndexDataExtractor(BusinessData(compHouseRec, vatRec, payeRec))
 
       BusinessIndex(
         id = x.id.toInt,
-        name = extractCompanyName,
-        uprn = extractUprn,
-        industryCode = extractIndustryCode,
-        legalStatus = extractLegalStatus,
-        tradingStatus = extractTradingStatus,
-        turnover = extractTurnover,
-        employmentBand = extractExploymentBand
+        name = extractor.companyName,
+        uprn = extractor.uprn,
+        industryCode = extractor.industryCode,
+        legalStatus = extractor.legalStatus,
+        tradingStatus = extractor.tradingStatus,
+        turnover = extractor.turnover,
+        employmentBand = extractor.exploymentBand
       )
     }
     }
   }
+}
 
-  // TODO: cleanup this triple tuple
-  def extractCompanyName()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])) = {
-    cvp match {
-      case (Some(ch), _, _) => ch.company_name
-      case (None, Some(vt), _) => vt.name.toString
-      case (None, None, Some(py)) => py.name.toString
-      case _ => ""
-    }
+case class BusinessData(c: List[CompaniesHouseRecord], v: List[VatRecord], p: List[PayeRecord2])
+
+
+object ExtractorHelper {
+
+  def firstNonEmpty[T](col: Seq[T])(f: T => String) = col.find(obj => f(obj).nonEmpty).map(f)
+
+}
+
+class BusinessIndexDataExtractor(cvp: BusinessData) {
+
+  import ExtractorHelper._
+
+  def companyName = cvp match {
+    case BusinessData(ch :: tl, _, _) => firstNonEmpty(ch :: tl)(_.company_name).getOrElse("") // example of how we can iterate throw all records to find first non empty§
+    case BusinessData(Nil, vt :: tl, _) => vt.name.toString
+    case BusinessData(Nil, Nil, py :: tl) => py.name.toString
+    case _ => ""
   }
 
-  def extractUprn()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): Long = {
+  def uprn: Long = {
     -1L // TODO: suppose to come from address index
   }
 
-
-  def extractIndustryCode()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): Long = {
-    cvp match {
-      case (_, Some(vt), _) => vt.inqcode.toLong
-      case (_, None, Some(py)) => py.inqcode.toLong
-      case _ => -1
-    }
+  def industryCode: Long = cvp match {
+    case BusinessData(_, vt :: tl, _) => vt.inqcode.toLong
+    case BusinessData(_, Nil, py :: tl) => py.inqcode.toLong
+    case _ => -1
   }
 
-  def extractLegalStatus()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
-    cvp match {
-      case (Some(c1), _, _) => c1.company_status // TODO: company status is legal status ?
-      case (None, Some(vt), _) => vt.legalstatus
-      case (None, None, Some(py)) => py.legalstatus
-      case _ => ""
-    }
+  def legalStatus: String = cvp match {
+    case BusinessData(c1 :: tl, _, _) => c1.company_status // TODO: company status is legal status ?
+    case BusinessData(Nil, vt :: tl, _) => vt.legalstatus
+    case BusinessData(Nil, Nil, py :: tl) => py.legalstatus
+    case _ => ""
   }
 
-  def extractTradingStatus()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
-    cvp match {
-      case (Some(c1), _, _) => c1.company_status
-      case _ => ""
-    }
+  def tradingStatus: String = cvp match {
+    case BusinessData(c1 :: tl, _, _) => c1.company_status
+    case _ => ""
   }
 
-  def extractTurnover()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
-    cvp match {
-      case (_, Some(vt), _) => vt.turnover
-      case _ => ""
-    }
+  def turnover: String = cvp match {
+    case BusinessData(_, vt :: tl, _) => vt.turnover
+    case _ => ""
   }
 
-  def extractExploymentBand()(implicit cvp: (Option[CompaniesHouseRecord], Option[VatRecord], Option[PayeRecord2])): String = {
-    cvp match {
-      case (_, _, Some(py)) => py.employer_cat
-      case _ => ""
-    }
+  def exploymentBand: String = cvp match {
+    case BusinessData(_, _, py :: tl) => py.employer_cat
+    case _ => ""
   }
+
 }

@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.mappings.FieldType.{CompletionType, LongType, Stri
 import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri, IndexResult}
 import com.typesafe.config.Config
 import org.elasticsearch.common.settings.Settings
+import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.models.BusinessIndex
 import uk.gov.ons.bi.ingest.process.{DataSource, MapDataSource}
 
@@ -17,12 +18,14 @@ import scala.concurrent.Future
   */
 class ElasticImporter(elastic: ElasticClient) {
 
+  private[this] val logger = LoggerFactory.getLogger(getClass)
+
 
   def initBiIndex(indexName: String) = {
     elastic.execute {
       delete index indexName
     } flatMap { x =>
-      println(s"Cleanup completed: $x")
+      logger.info(s"Cleanup completed: $x")
       elastic.execute {
         // define the ElasticSearch index
         create.index(indexName).mappings(
@@ -50,7 +53,7 @@ class ElasticImporter(elastic: ElasticClient) {
   def loadBusinessIndex(indexName: String, d: DataSource[String, BusinessIndex]) = {
     val r = d.map { bi =>
       elastic.execute {
-        println(s"Indexing entry in ElasticSearch $bi")
+        logger.debug(s"Indexing entry in ElasticSearch $bi")
         index into indexName / "business" id bi.id fields(
           "BusinessName" -> bi.name,
           "UPRN" -> bi.uprn,
@@ -72,11 +75,13 @@ case class ElasticConfiguration(localMode: Boolean, clusterName: String, uri: St
 
 object BiConfigManager {
 
+  private[this] val logger = LoggerFactory.getLogger(BiConfigManager.getClass)
+
   def envConf(conf: Config) = {
     val env = sys.props.get("environment").getOrElse("default")
-    println(s"Load config for [$env] env")
+    logger.info(s"Load config for [$env] env")
     val envConf = conf.getConfig(s"env.$env")
-    println(envConf)
+    logger.debug(envConf.toString)
     envConf
   }
 }
@@ -94,8 +99,7 @@ object ElasticClientBuilder {
   }
 
   def buildWithConfig(config: ElasticConfiguration) = {
-    val settings = Settings.settingsBuilder()
-      .put("client.transport.sniff", config.sniffEnabled)
+    val settings = Settings.settingsBuilder().put("client.transport.sniff", config.sniffEnabled)
 
     config.localMode match {
       case true =>

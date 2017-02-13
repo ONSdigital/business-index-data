@@ -3,6 +3,7 @@ package uk.gov.ons.bi.ingest.process
 import java.io.File
 
 import com.typesafe.config.ConfigFactory
+import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
@@ -21,6 +22,8 @@ import scala.util.{Failure, Success, Try}
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
 object BusinessLinkerApp extends App {
+
+  private[this] val logger = LoggerFactory.getLogger(getClass)
 
   // elastic search part
 
@@ -102,14 +105,14 @@ object BusinessLinkerApp extends App {
 //  }
   val resFutures = elasticImporter.loadBusinessIndex(biName, busObjs)
   // blocking, for test purposes only
-  Try(Await.result(resFutures, 10.seconds)) match {
+  val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt
+  Try(Await.result(resFutures, loadTimeout.seconds)) match {
     case Success(ress) =>
-      ress.foreach(r => {
-        println(r.original)
-        println(s"${r.id} -> created: ${r.isCreated}")
-      })
-      println(s"Successfully imported data")
-    case Failure(err) => println("Unable to import data" + err)
+//      ress.foreach(r => {
+//        logger.debug(r.original)
+//        logger.debug(s"${r.id} -> created: ${r.isCreated}")
+//      })
+      logger.info(s"Successfully imported data")
+    case Failure(err) => logger.error("Unable to import data", err)
   }
-
 }

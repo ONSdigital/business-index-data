@@ -42,6 +42,9 @@ class BusinessIndexTest extends FlatSpec {
       asMapDS(payeMapList),
       asMapDS(chMapList)
     )
-    busObjs.foreach(x => assert(x.id > 0, "Id populated"))
+    busObjs.foreach(x => {
+      assert(x.id > 0, "Id populated")
+      assert(x.name.nonEmpty, "Non empty company name")
+    })
   }
 }
