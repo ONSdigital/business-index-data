@@ -9,9 +9,11 @@ import uk.gov.ons.bi.ingest.helper.Utils._
   */
 class CsvProcessorTest extends FlatSpec {
 
+  sys.props += "ignore.csv.errors" -> "false" // fast fail approach. assume test resources will have valid data
+
   import CsvProcessor._
 
-  val files = Map("/CH_original.csv" -> 199, "/PAYE_original.csv" -> 4,
+  val files = Map("/CH_original.csv" -> 199, "/PAYE_original.csv" -> 5,
     "/CH_Output.csv" -> 100, "/PAYE_Output.csv" -> 100, "/VAT_Output.csv" -> 100)
 
 
@@ -38,6 +40,12 @@ class CsvProcessorTest extends FlatSpec {
     val vat = getResource("/VAT_Output.csv")
     val vatMapList = csvToMapToObj(vat, VATBuilder.vatFromMap)
     assert(vatMapList.flatten.toSeq.size == 100)
+  }
+
+  "Original PAYE information" should "be correctly parsed" in {
+    val paye = getResource("/PAYE_Original.csv")
+    val payeMapList = csvToMapToObj(paye, PayeBuilder.payeFromMap)
+    assert(payeMapList.flatten.toSeq.size == 5)
   }
 
   //  // Performance test ...

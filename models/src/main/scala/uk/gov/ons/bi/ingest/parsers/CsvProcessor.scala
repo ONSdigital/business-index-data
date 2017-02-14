@@ -23,14 +23,16 @@ object CsvProcessor {
   def csvToMapToObj[T](csvString: Iterator[String], f: Map[String, String] => T) = {
     val counter = new AtomicInteger(0)
 
-    def splt(s: String) = s.split(Delimiter).map(v => unquote(v.trim))
+    def splt(s: String) = s.split(Delimiter, -1).toList.map(v => unquote(v.trim))
 
     val header = splt(csvString.next)
 
     val res = csvString.map(dataLine => Future {
       val c = counter.incrementAndGet()
       if (c % 10000 == 0) logger.debug(s"Processed $c records")
-      f(header zip splt(dataLine) toMap)
+      val data = splt(dataLine)
+      require (header.length == data.length, s"Data size does not reflect header [${header.length} <> ${data.length}]. \n$header \n$data")
+      f(header zip data toMap)
     })
     Await.result(Future.sequence(res), 60 minutes)
   }

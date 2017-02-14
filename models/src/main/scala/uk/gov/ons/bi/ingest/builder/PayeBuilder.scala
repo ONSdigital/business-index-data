@@ -11,7 +11,8 @@ object PayeBuilder {
 
 }
 
-class PayeBuilder(val map: Map[String, String]) extends RecordBuilder[PayeRecord2] {
+class PayeBuilder(val map: Map[String, String])
+    extends RecordBuilder[PayeRecord2] {
 
   // entref,payeref,deathcode,birthdate,deathdate,mfullemp,msubemp,ffullemp,fsubemp,unclemp,unclsubemp,
   // dec_jobs,mar_jobs,june_jobs,sept_jobs,
@@ -53,7 +54,6 @@ class PayeBuilder(val map: Map[String, String]) extends RecordBuilder[PayeRecord
     )
   }
 
-
   protected def payeEmpFromMap = PayeEmp(
     mfullemp = map("mfullemp").toInt,
     msubemp = map("msubemp").toInt,
@@ -69,6 +69,5 @@ class PayeBuilder(val map: Map[String, String]) extends RecordBuilder[PayeRecord
     june_jobs = map("june_jobs"),
     sept_jobs = map("sept_jobs")
   )
-
 
 }
