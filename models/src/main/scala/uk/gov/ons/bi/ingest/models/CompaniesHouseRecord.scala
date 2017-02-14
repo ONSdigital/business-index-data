@@ -11,7 +11,7 @@ case class Accounts(
 )
 
 case class Returns(
-  next_due_date: DateTime,
+  next_due_date: Option[DateTime],
   last_made_up_date: Option[DateTime]
 )
 
@@ -30,8 +30,8 @@ case class SICCode(
 )
 
 case class LimitedPartnerships(
-  num_gen_partners: Int,
-  num_lim_partners: Int
+  num_gen_partners: Option[Int],
+  num_lim_partners: Option[Int]
 )
 
 case class PreviousName(

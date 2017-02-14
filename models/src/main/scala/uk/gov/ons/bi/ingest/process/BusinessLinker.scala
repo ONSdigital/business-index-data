@@ -18,7 +18,7 @@ class BusinessLinker {
       val extractor = new BusinessIndexDataExtractor(BusinessData(compHouseRec, vatRec, payeRec))
 
       BusinessIndex(
-        id = x.id.toInt,
+        id = x.id.toLong,
         name = extractor.companyName,
         uprn = extractor.uprn,
         industryCode = extractor.industryCode,

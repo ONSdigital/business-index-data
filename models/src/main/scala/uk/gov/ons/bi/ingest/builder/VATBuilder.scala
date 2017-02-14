@@ -12,24 +12,26 @@ object VATBuilder {
 }
 
 class VATBuilder(val map: Map[String, String]) extends RecordBuilder[VatRecord] {
-  override def build: VatRecord = VatRecord(
-    entref = map("entref"),
-    vatref = map("vatref"),
-    deathcode = map("deathcode"),
-    birthdate = map("birthdate"),
-    deathdate = map("deathdate"),
-    sic92 = map("sic92"),
-    turnover = map("turnover"),
-    turnover_date = map("turnover_date"),
-    record_type = map("record_type"),
-    legalstatus = map("legalstatus"),
-    actiondate = map("actiondate"),
-    crn = map("crn"),
-    marker = map("marker"),
-    addressref = map("addressref"),
-    inqcode = map("inqcode"),
-    name = multiLineNameFromMap,
-    tradStyle = tradStyleFromMap,
-    address = addressFromMap
-  )
+  override def build = handled {
+    VatRecord(
+      entref = map("entref"),
+      vatref = map("vatref"),
+      deathcode = map("deathcode"),
+      birthdate = map("birthdate"),
+      deathdate = map("deathdate"),
+      sic92 = map("sic92"),
+      turnover = map("turnover"),
+      turnover_date = map("turnover_date"),
+      record_type = map("record_type"),
+      legalstatus = map("legalstatus"),
+      actiondate = map("actiondate"),
+      crn = map("crn"),
+      marker = map("marker"),
+      addressref = map("addressref"),
+      inqcode = map("inqcode"),
+      name = multiLineNameFromMap,
+      tradStyle = tradStyleFromMap,
+      address = addressFromMap
+    )
+  }
 }

@@ -1,8 +1,8 @@
 package uk.gov.ons.bi.ingest.parsers
 
 import org.scalatest.FlatSpec
-import uk.gov.ons.bi.ingest.helpers.IOHelper
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
+import uk.gov.ons.bi.ingest.helper.Utils._
 
 /**
   * Created by Volodymyr.Glushak on 08/02/2017.
@@ -10,40 +10,39 @@ import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 class CsvProcessorTest extends FlatSpec {
 
   import CsvProcessor._
-  import IOHelper._
 
-  val files = Map("/CH_Output.csv" -> 100, "/PAYE_Output.csv" -> 100, "/VAT_Output.csv" -> 100)
+  val files = Map("/CH_original.csv" -> 199, "/PAYE_original.csv" -> 4,
+    "/CH_Output.csv" -> 100, "/PAYE_Output.csv" -> 100, "/VAT_Output.csv" -> 100)
 
 
   files.foreach { case (file, sz) =>
     s"$file test file" should "transform to map properly" in {
-      val data = readFile(file)
+      val data = getResource(file)
       assert(csvToMap(data).size == sz, s"$file size is invalid")
     }
   }
 
-
   "Company house" should "be created from map" in {
-    val ch = readFile("/CH_Output.csv")
-    val chMapList = csvToMap(ch)
-    chMapList.foreach(chCmp =>
-      CHBuilder.companyHouseFromMap(chCmp)
-    )
+    val ch = getResource("/CH_Output.csv")
+    val chMapList = csvToMapToObj(ch, CHBuilder.companyHouseFromMap)
+    assert(chMapList.flatten.toSeq.size == 100)
   }
 
   "PAYE information" should "be created from map" in {
-    val paye = readFile("/PAYE_Output.csv")
-    val payeMapList = csvToMap(paye)
-    payeMapList.foreach(payeRec =>
-      PayeBuilder.payeFromMap(payeRec)
-    )
+    val paye = getResource("/PAYE_Output.csv")
+    val payeMapList = csvToMapToObj(paye, PayeBuilder.payeFromMap)
+    assert(payeMapList.flatten.toSeq.size == 100)
   }
 
   "VAT information" should "be created from map" in {
-    val vat = readFile("/VAT_Output.csv")
-    val vatMapList = csvToMap(vat)
-    vatMapList.foreach(vatRec =>
-      VATBuilder.vatFromMap(vatRec)
-    )
+    val vat = getResource("/VAT_Output.csv")
+    val vatMapList = csvToMapToObj(vat, VATBuilder.vatFromMap)
+    assert(vatMapList.flatten.toSeq.size == 100)
   }
+
+  //  // Performance test ...
+  //  "ALL CH" should "be read and parsed" in {
+  //    val ch = readFile("/Users/Volodymyr.Glushak/Downloads/BasicCompanyData-2017-02-03-part1_5.csv")
+  //    assert(csvToMapToObj(ch, CHBuilder.companyHouseFromMap).length == 850000 - 1)
+  //  }
 }

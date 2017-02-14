@@ -1,7 +1,10 @@
 package uk.gov.ons.bi.ingest.builder
 
+import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.models._
 import uk.gov.ons.bi.ingest.parsers.ImplicitHelpers._
+
+import scala.util.control.NonFatal
 
 
 /**
@@ -10,10 +13,16 @@ import uk.gov.ons.bi.ingest.parsers.ImplicitHelpers._
 
 object CHBuilder {
   def companyHouseFromMap(map: Map[String, String]) = new CHBuilder(map).build
+
+  val IgnoreBrokenRecords = sys.props.getOrElse("ignore.csv.errors", "true").toBoolean
 }
 
 class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHouseRecord] {
 
+  def mapFirst(keys: String*) = {
+    map(keys.find(k => map.get(k).nonEmpty).getOrElse(sys.error(s"Not found keys $keys in CH map $map")))
+  } 
+  
   // CompanyName,CompanyNumber,
   // RegAddressCareOf,RegAddressPOBox,
   // RegAddressAddressLine1,RegAddressAddressLine2,RegAddressPostTown,RegAddressCounty,RegAddressCountry,RegAddressPostCode,
@@ -37,7 +46,8 @@ class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHou
   // PreviousName_10CONDATE,PreviousName_10CompanyName
 
 
-  def build = CompaniesHouseRecord(
+  def build = handled {
+    CompaniesHouseRecord(
       id = "???",
       company_name = map("CompanyName"),
       company_number = map("CompanyNumber"),
@@ -53,34 +63,36 @@ class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHou
       uri = map("URI").?,
       previous_names = previousNamesFromMap
     )
+  }
 
   // AccountsAccountRefDay,AccountsAccountRefMonth,AccountsNextDueDate,AccountsLastMadeUpDate,AccountsAccountCategory,
 
+
   def accountFromMap = {
     Accounts(
-      accounts_ref_day = map("AccountsAccountRefDay"),
-      accounts_ref_month = map("AccountsAccountRefMonth"),
-      next_due_date = map("AccountsNextDueDate").asDateTimeOpt,
-      last_made_up_date = map("AccountsLastMadeUpDate").asDateTimeOpt,
-      account_category = map("AccountsAccountCategory").?
+      accounts_ref_day = mapFirst("AccountsAccountRefDay", "Accounts.AccountRefDay"),
+      accounts_ref_month = mapFirst("AccountsAccountRefMonth","Accounts.AccountRefMonth"),
+      next_due_date = mapFirst("AccountsNextDueDate", "Accounts.NextDueDate").asDateTimeOpt,
+      last_made_up_date = mapFirst("AccountsLastMadeUpDate", "Accounts.LastMadeUpDate").asDateTimeOpt,
+      account_category = mapFirst("AccountsAccountCategory", "Accounts.AccountCategory").?
     )
   }
 
   // ReturnsNextDueDate,ReturnsLastMadeUpDate,
   def returnsFromMap = {
     Returns(
-      next_due_date = map("ReturnsNextDueDate").asDateTime,
-      last_made_up_date = map("ReturnsLastMadeUpDate").asDateTimeOpt
+      next_due_date = mapFirst("ReturnsNextDueDate", "Returns.NextDueDate").asDateTimeOpt,
+      last_made_up_date = mapFirst("ReturnsLastMadeUpDate", "Returns.LastMadeUpDate").asDateTimeOpt
     )
   }
 
   // SICCodeSicText_1,SICCodeSicText_2,SICCodeSicText_3,SICCodeSicText_4,
   def sicCodeFromMap = {
     SICCode(
-      sic_text_1 = map("SICCodeSicText_1"),
-      sic_text_2 = map("SICCodeSicText_2"),
-      sic_text_3 = map("SICCodeSicText_3"),
-      sic_text_4 = map("SICCodeSicText_4")
+      sic_text_1 = mapFirst("SICCodeSicText_1", "SICCode.SicText_1"),
+      sic_text_2 = mapFirst("SICCodeSicText_2", "SICCode.SicText_2"),
+      sic_text_3 = mapFirst("SICCodeSicText_3", "SICCode.SicText_3"),
+      sic_text_4 = mapFirst("SICCodeSicText_4", "SICCode.SicText_4")
     )
   }
 
@@ -88,8 +100,8 @@ class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHou
   // LimitedPartnershipsNumGenPartners,LimitedPartnershipsNumLimPartners,
   def limitedPartnershipFromMap = {
     LimitedPartnerships(
-      num_gen_partners = map("LimitedPartnershipsNumGenPartners").toInt,
-      num_lim_partners = map("LimitedPartnershipsNumLimPartners").toInt
+      num_gen_partners = mapFirst("LimitedPartnershipsNumGenPartners", "LimitedPartnerships.NumGenPartners").asIntOpt,
+      num_lim_partners = mapFirst("LimitedPartnershipsNumLimPartners", "LimitedPartnerships.NumLimPartners").asIntOpt
     )
   }
 
@@ -107,8 +119,8 @@ class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHou
   def previousNamesFromMap = {
     def getPrevName(i: Int) = {
       PreviousName(
-        condate = map(s"PreviousName_${i}CONDATE"),
-        company_name = map(s"PreviousName_${i}CompanyName")
+        condate = mapFirst(s"PreviousName_${i}CONDATE", s"PreviousName_$i.CONDATE"),
+        company_name = mapFirst(s"PreviousName_${i}CompanyName", s"PreviousName_$i.CompanyName")
       ).?
     }
     PreviousNames(

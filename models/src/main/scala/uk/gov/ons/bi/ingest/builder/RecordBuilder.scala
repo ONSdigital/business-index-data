@@ -1,15 +1,30 @@
 package uk.gov.ons.bi.ingest.builder
 
+import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.models.{Address, PayeName, TradStyle}
+
+import scala.util.control.NonFatal
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
 trait RecordBuilder[T] {
 
+  private[this] val logger = LoggerFactory.getLogger(getClass)
+
   def map: Map[String, String]
 
-  def build: T
+  def build: Option[T]
+
+  def handled(f: => T): Option[T] = {
+    try {
+      Some(f)
+    } catch {
+      case NonFatal(exc) =>
+        val msg = s"Exception while building record ${exc.getMessage}. Data map: $map"
+        if (CHBuilder.IgnoreBrokenRecords) { logger.error(msg); None} else throw new RuntimeException(msg, exc)
+    }
+  }
 
   // util methods below that are used in more than one type of records
   protected def multiLineNameFromMap = PayeName(

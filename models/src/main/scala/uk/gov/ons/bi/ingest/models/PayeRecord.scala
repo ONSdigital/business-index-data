@@ -31,7 +31,7 @@ case class PayeEmp(
 
 case class PayeRecord2(
   entref: String,
-  payeref: Int,
+  payeref: String,
   deathcode: String,
   birthdate: String,
   deathdate: String,

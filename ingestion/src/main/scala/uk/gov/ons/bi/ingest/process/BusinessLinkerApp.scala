@@ -1,20 +1,16 @@
 package uk.gov.ons.bi.ingest.process
 
-import java.io.File
-
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
+import uk.gov.ons.bi.ingest.helper.Utils._
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
 import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.io.Source
 import scala.util.{Failure, Success, Try}
-
 /**
   *
   * Temporary application for testing. Eventually code from this class should be migrated to Spark
@@ -35,23 +31,6 @@ object BusinessLinkerApp extends App {
 
   def getProp(name: String) = config.getString(name)
 
-  def readFile(filename: String) = Source.fromFile(filename).getLines.toSeq
-
-  def writeToFile(name: String, content: String) = {
-    printToFile(name) { x =>
-      x.println(content)
-    }
-  }
-
-  def printToFile(name: String)(op: java.io.PrintWriter => Unit) {
-    val p = new java.io.PrintWriter(new File(name))
-    try {
-      op(p)
-    } finally {
-      p.close()
-    }
-  }
-
   val chPath = getProp("ch.path")
   val payePath = getProp("paye.path")
   val vatPath = getProp("vat.path")
@@ -62,11 +41,12 @@ object BusinessLinkerApp extends App {
   // read all input data
   // we need all InputData to be represented as DataSource
 
-  val chMapList = csvToMap(readFile(chPath)).map(CHBuilder.companyHouseFromMap).map(ch => ch.company_number -> ch).toMap
 
-  val payeMapList = csvToMap(readFile(payePath)).map(PayeBuilder.payeFromMap).map(py => py.entref -> py).toMap
+  val chMapList = csvToMapToObj(readFile(chPath), CHBuilder.companyHouseFromMap).flatten.map(ch => ch.company_number -> ch).toMap
 
-  val vatMapList = csvToMap(readFile(vatPath)).map(VATBuilder.vatFromMap).map(vt => vt.entref -> vt).toMap
+  val payeMapList = csvToMapToObj(readFile(payePath), PayeBuilder.payeFromMap).flatten.map(py => py.entref -> py).toMap
+
+  val vatMapList = csvToMapToObj(readFile(vatPath), VATBuilder.vatFromMap).flatten.map(vt => vt.entref -> vt).toMap
 
   val links = LinkedFileParser.parse(readFile(linkingPath).mkString("\n")).head.map { lk =>
     lk.id -> lk

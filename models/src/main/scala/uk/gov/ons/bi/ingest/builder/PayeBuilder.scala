@@ -28,28 +28,30 @@ class PayeBuilder(val map: Map[String, String]) extends RecordBuilder[PayeRecord
   // address1,address2,address3,address4,address5,
   // postcode
 
-  def build = PayeRecord2(
-    entref = map("entref"),
-    payeref = map("payeref").toInt,
-    deathcode = map("deathcode"),
-    birthdate = map("birthdate"),
-    deathdate = map("deathdate"),
-    payeEmp = payeEmpFromMap,
-    month_jobs = monthJobsFromMap,
-    jobs_lastupd = map("jobs_lastupd"),
-    legalstatus = map("legalstatus"),
-    prevpaye = map("prevpaye"),
-    employer_cat = map("employer_cat"),
-    stc = map("stc"),
-    crn = map("crn"),
-    actiondate = map("actiondate"),
-    addressref = map("addressref"),
-    marker = map("marker"),
-    inqcode = map("inqcode"),
-    name = multiLineNameFromMap,
-    tradstyle = tradStyleFromMap,
-    address = addressFromMap
-  )
+  def build = handled {
+    PayeRecord2(
+      entref = map("entref"),
+      payeref = map("payeref"),
+      deathcode = map("deathcode"),
+      birthdate = map("birthdate"),
+      deathdate = map("deathdate"),
+      payeEmp = payeEmpFromMap,
+      month_jobs = monthJobsFromMap,
+      jobs_lastupd = map("jobs_lastupd"),
+      legalstatus = map("legalstatus"),
+      prevpaye = map("prevpaye"),
+      employer_cat = map("employer_cat"),
+      stc = map("stc"),
+      crn = map("crn"),
+      actiondate = map("actiondate"),
+      addressref = map("addressref"),
+      marker = map("marker"),
+      inqcode = map("inqcode"),
+      name = multiLineNameFromMap,
+      tradstyle = tradStyleFromMap,
+      address = addressFromMap
+    )
+  }
 
 
   protected def payeEmpFromMap = PayeEmp(

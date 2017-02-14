@@ -2,9 +2,9 @@ package uk.gov.ons.bi.ingest.parsers
 
 import org.scalatest.FlatSpec
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
-import uk.gov.ons.bi.ingest.helpers.IOHelper._
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.ingest.process.{BusinessLinker, MapDataSource}
+import uk.gov.ons.bi.ingest.helper.Utils._
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
@@ -16,19 +16,16 @@ class BusinessIndexTest extends FlatSpec {
     // read all input data
     // we need all InputData to be represented as DataSource
 
-    val chMapList = csvToMap(readFile("/CH_Output.csv")).map(chCmp =>
-      CHBuilder.companyHouseFromMap(chCmp)
-    ).map(ch => ch.company_number -> ch).toMap
+    val chMapList = csvToMapToObj(getResource("/CH_Output.csv"), CHBuilder.companyHouseFromMap).flatten
+      .map(ch => ch.company_number -> ch).toMap
 
-    val payeMapList = csvToMap(readFile("/PAYE_Output.csv")).map(payeRec =>
-      PayeBuilder.payeFromMap(payeRec)
-    ).map(py => py.entref -> py).toMap
+    val payeMapList = csvToMapToObj(getResource("/PAYE_Output.csv"), PayeBuilder.payeFromMap).flatten
+      .map(py => py.entref -> py).toMap
 
-    val vatMapList = csvToMap(readFile("/VAT_Output.csv")).map(vatRec =>
-      VATBuilder.vatFromMap(vatRec)
-    ).map(vt => vt.entref -> vt).toMap
+    val vatMapList = csvToMapToObj(getResource("/VAT_Output.csv"), VATBuilder.vatFromMap).flatten
+      .map(vt => vt.entref -> vt).toMap
 
-    val links = LinkedFileParser.parse(readFile("/links.json").mkString("\n")).head.map { lk =>
+    val links = LinkedFileParser.parse(getResource("/links.json").mkString("\n")).head.map { lk =>
       lk.id -> lk
     }.toMap
 

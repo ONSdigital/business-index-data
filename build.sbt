@@ -73,13 +73,13 @@ lazy val sparkIngestion = (project in file("ingestion"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.json4s" %% "json4s-native" % Versions.json4s,
-      "org.rogach" %% "scallop" % Versions.scallop,
-      "com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s,
-      "org.apache.spark" %% "spark-core" % Versions.spark,
-      "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
-        ExclusionRule(organization = "javax.servlet")
-      }
+//      "org.json4s" %% "json4s-native" % Versions.json4s,
+      "org.rogach" %% "scallop" % Versions.scallop  ,
+      "com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s // ,
+//      "org.apache.spark" %% "spark-core" % Versions.spark,
+//      "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
+//        ExclusionRule(organization = "javax.servlet")
+//      }
     )
   ).dependsOn(
     models
