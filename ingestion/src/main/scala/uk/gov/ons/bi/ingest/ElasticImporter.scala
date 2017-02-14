@@ -59,17 +59,18 @@ class ElasticImporter(elastic: ElasticClient) {
     val r = d match {
       case data: MapDataSource[String, BusinessIndex] => data.data.grouped(BatchSize).map { biMap =>
         if (TheadDelays > 0) Thread.sleep(TheadDelays)
+        logger.debug(s"Bulk of size ${biMap.size} is about to be processed...")
         elastic.execute {
           bulk(
             biMap.map { case (i, bi) =>
-              logger.debug(s"Indexing entry in ElasticSearch $bi")
+              logger.trace(s"Indexing entry in ElasticSearch $bi")
               index into indexName / "business" id bi.id fields("BusinessName" -> bi.name.toUpperCase,
                 "UPRN" -> bi.uprn,
                 "IndustryCode" -> bi.industryCode,
                 "LegalStatus" -> bi.legalStatus,
                 "TradingStatus" -> bi.tradingStatus,
                 "Turnover" -> bi.turnover,
-                "EmploymentBands" -> bi.turnover)
+                "EmploymentBands" -> bi.employmentBand)
             }.toSeq)
         }
       }
