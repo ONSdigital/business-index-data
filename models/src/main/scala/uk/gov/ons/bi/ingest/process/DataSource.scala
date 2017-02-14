@@ -16,6 +16,8 @@ trait DataSource[I, T] {
 
   def map[Z](x: T => Z): DataSource[I, Z]
 
+  def filter(x: T => Boolean): DataSource[I, T]
+
   def foreach[Z](x: T => Z): Unit
 
   def getById(id: I): Option[T]
@@ -26,7 +28,9 @@ class MapDataSource[I, T](val data: Map[I, T]) extends DataSource[I, T] {
 
   override def getById(id: I): Option[T] = data.get(id)
 
-  override def map[Z](x: (T) => Z) = new MapDataSource(data.map { case (k, v) => k -> x(v)})
+  override def map[Z](x: (T) => Z) = new MapDataSource(data.map { case (k, v) => k -> x(v) })
 
-  override def foreach[Z](x: (T) => Z) = data.foreach { case (k, v) => k -> x(v)}
+  override def foreach[Z](x: (T) => Z) = data.foreach { case (k, v) => k -> x(v) }
+
+  override def filter(x: (T) => Boolean) = new MapDataSource(data.filter { case (k, v) => x(v) })
 }

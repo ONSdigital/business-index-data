@@ -11,6 +11,7 @@ import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImpor
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
+
 /**
   *
   * Temporary application for testing. Eventually code from this class should be migrated to Spark
@@ -41,51 +42,38 @@ object BusinessLinkerApp extends App {
   // read all input data
   // we need all InputData to be represented as DataSource
 
-
-  val chMapList = csvToMapToObj(readFile(chPath), CHBuilder.companyHouseFromMap).flatten.map(ch => ch.company_number -> ch).toMap
-
-  val payeMapList = csvToMapToObj(readFile(payePath), PayeBuilder.payeFromMap).flatten.map(py => py.entref -> py).toMap
-
-  val vatMapList = csvToMapToObj(readFile(vatPath), VATBuilder.vatFromMap).flatten.map(vt => vt.entref -> vt).toMap
-
-  val links = LinkedFileParser.parse(readFile(linkingPath).mkString("\n")).head.map { lk =>
-    lk.id -> lk
-  }.toMap
-
-  def asMapDS[T](map: Map[String, T]) = new MapDataSource(map)
-
   // invoke linker class
-  // and pass CSV as DataSources
-  val busObjs = new BusinessLinker().buildLink(
-    asMapDS(links),
-    asMapDS(vatMapList),
-    asMapDS(payeMapList),
-    asMapDS(chMapList)
+  // and pass CSV as links
+  val busObjs = new BusinessLinker().transformAndLink(
+    readFile(vatPath),
+    readFile(payePath),
+    readFile(chPath),
+    readFile(linkingPath).mkString("\n")
   )
 
   val header = """"ID","BusinessName","UPRN","IndustryCode","LegalStatus","TradingStatus","Turnover","EmploymentBands""""
 
   printToFile(outPath) { writer =>
-
     writer.println(header)
     busObjs.foreach(x => writer.println(x.toCsv))
-
   }
 
+  logger.info("File saved. Output data to elasticsearch ... ")
+
   val biName = getProp("elasticsearch.bi.name")
-//  val resFutures = elasticImporter.initBiIndex(biName) flatMap { x =>
-//    println(s"Index created with results $x")
-//    elasticImporter.loadBusinessIndex(biName, busObjs)
-//  }
+  //  val resFutures = elasticImporter.initBiIndex(biName) flatMap { x =>
+  //    println(s"Index created with results $x")
+  //    elasticImporter.loadBusinessIndex(biName, busObjs)
+  //  }
   val resFutures = elasticImporter.loadBusinessIndex(biName, busObjs)
   // blocking, for test purposes only
   val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt
   Try(Await.result(resFutures, loadTimeout.seconds)) match {
     case Success(ress) =>
-//      ress.foreach(r => {
-//        logger.debug(r.original)
-//        logger.debug(s"${r.id} -> created: ${r.isCreated}")
-//      })
+      //      ress.foreach(r => {
+      //        logger.debug(r.original)
+      //        logger.debug(s"${r.id} -> created: ${r.isCreated}")
+      //      })
       logger.info(s"Successfully imported data")
     case Failure(err) => logger.error("Unable to import data", err)
   }

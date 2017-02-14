@@ -1,11 +1,17 @@
 package uk.gov.ons.bi.ingest.process
 
+import org.slf4j.LoggerFactory
+import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.models._
+import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
+import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
 class BusinessLinker {
+
+  private[this] val logger = LoggerFactory.getLogger(getClass)
 
   def buildLink(linking: DataSource[String, LinkedRecord],
                 vat: DataSource[String, VatRecord],
@@ -15,10 +21,17 @@ class BusinessLinker {
       val compHouseRec = x.ch.flatMap(ch.getById)
       val payeRec = x.paye.flatMap(paye.getById)
       val vatRec = x.vat.flatMap(vat.getById)
-      val extractor = new BusinessIndexDataExtractor(BusinessData(compHouseRec, vatRec, payeRec))
+      new BusinessIndexDataExtractor(BusinessData(x.ubrn, compHouseRec, vatRec, payeRec))
+    }
+    }.filter(x => x.cvp match {
+      case BusinessData(id, Nil, Nil, Nil) =>
+        logger.warn(s"There are no links for ubrn: $id. Ignoring record")
+        false
+      case _ => true
+    }).map { extractor =>
 
       BusinessIndex(
-        id = x.id.toLong,
+        id = extractor.uprn,
         name = extractor.companyName,
         uprn = extractor.uprn,
         industryCode = extractor.industryCode,
@@ -28,60 +41,36 @@ class BusinessLinker {
         employmentBand = extractor.exploymentBand
       )
     }
-    }
-  }
-}
-
-case class BusinessData(c: List[CompaniesHouseRecord], v: List[VatRecord], p: List[PayeRecord2])
-
-
-object ExtractorHelper {
-
-  def firstNonEmpty[T](col: Seq[T])(f: T => String) = col.find(obj => f(obj).nonEmpty).map(f)
-
-}
-
-class BusinessIndexDataExtractor(cvp: BusinessData) {
-
-  import ExtractorHelper._
-
-  def companyName = cvp match {
-    case BusinessData(ch :: tl, _, _) => firstNonEmpty(ch :: tl)(_.company_name).getOrElse("") // example of how we can iterate throw all records to find first non empty§
-    case BusinessData(Nil, vt :: tl, _) => vt.name.toString
-    case BusinessData(Nil, Nil, py :: tl) => py.name.toString
-    case _ => ""
   }
 
-  def uprn: Long = {
-    -1L // TODO: suppose to come from address index
-  }
+  def transformAndLink(vatStream: Iterator[String],
+                       payeStream: Iterator[String],
+                       chStream: Iterator[String],
+                       linkingData: String) = {
+    val vatMapList = csvToMapToObj(vatStream, VATBuilder.vatFromMap).flatten.map(vt => vt.entref -> vt).toMap
 
-  def industryCode: Long = cvp match {
-    case BusinessData(_, vt :: tl, _) => vt.inqcode.toLong
-    case BusinessData(_, Nil, py :: tl) => py.inqcode.toLong
-    case _ => -1
-  }
+    val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap).flatten.map(py => py.entref -> py).toMap
 
-  def legalStatus: String = cvp match {
-    case BusinessData(c1 :: tl, _, _) => c1.company_status // TODO: company status is legal status ?
-    case BusinessData(Nil, vt :: tl, _) => vt.legalstatus
-    case BusinessData(Nil, Nil, py :: tl) => py.legalstatus
-    case _ => ""
-  }
+    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap).flatten.map(ch => ch.company_number -> ch).toMap
 
-  def tradingStatus: String = cvp match {
-    case BusinessData(c1 :: tl, _, _) => c1.company_status
-    case _ => ""
-  }
+    val links = LinkedFileParser.parse(linkingData).map { lk => lk.ubrn -> lk }.toMap
 
-  def turnover: String = cvp match {
-    case BusinessData(_, vt :: tl, _) => vt.turnover
-    case _ => ""
-  }
+    logger.info("Input data read completed. Linking data ... ")
 
-  def exploymentBand: String = cvp match {
-    case BusinessData(_, _, py :: tl) => py.employer_cat
-    case _ => ""
+    def asMapDS[T](map: Map[String, T]) = new MapDataSource(map)
+
+    // invoke linker class
+    // and pass CSV as DataSources
+    val busObjs = new BusinessLinker().buildLink(
+      asMapDS(links),
+      asMapDS(vatMapList),
+      asMapDS(payeMapList),
+      asMapDS(chMapList)
+    )
+    logger.info("Linking completed.")
+    busObjs
   }
 
 }
+
+case class BusinessData(ubrn: String, c: List[CompaniesHouseRecord], v: List[VatRecord], p: List[PayeRecord2])

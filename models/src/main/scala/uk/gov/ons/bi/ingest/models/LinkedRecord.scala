@@ -1,7 +1,5 @@
 package uk.gov.ons.bi.ingest.models
 
-import scala.collection.generic.CanBuildFrom
-
 /*
 
 {
@@ -9,29 +7,8 @@ import scala.collection.generic.CanBuildFrom
   "1":{"CH":["34567890"],"PAYE":[],"VAT":["123123123123"]}
 }
  */
-
-case class LinkedRecord(id: String, paye: List[String], ch: List[String], vat: List[String]) {
-  override def toString: String = s"$id - CH: $ch, PAYE - $paye, VAT - $vat"
+case class LinkedRecord(ubrn: String, paye: List[String], ch: List[String], vat: List[String]) {
+  override def toString: String = s"$ubrn - CH: $ch, PAYE - $paye, VAT - $vat"
 }
-
-
-object LinkedRecord {
-
-  def apply[M[X] <: TraversableOnce[X]](col: M[(String, InnerLink)])(
-    implicit cbf: CanBuildFrom[M[(String, InnerLink)], LinkedRecord, M[LinkedRecord]]
-  ): M[LinkedRecord] = {
-    val builder = cbf()
-
-    for ((id, rec) <- col) builder += LinkedRecord(id, rec.paye, rec.ch, rec.vat)
-
-    builder.result()
-  }
-}
-
-case class InnerLink(
-  paye: List[String],
-  ch: List[String],
-  vat: List[String]
-)
 
 

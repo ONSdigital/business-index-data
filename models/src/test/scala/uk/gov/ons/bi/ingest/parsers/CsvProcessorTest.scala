@@ -25,9 +25,11 @@ class CsvProcessorTest extends FlatSpec {
   }
 
   "Company house" should "be created from map" in {
-    val ch = getResource("/CH_Output.csv")
+    val ch = getResource("/CH_original.csv")
     val chMapList = csvToMapToObj(ch, CHBuilder.companyHouseFromMap)
-    assert(chMapList.flatten.toSeq.size == 100)
+    val data = chMapList.flatten.toSeq
+    println(data.take(1))
+    assert(data.size == 199)
   }
 
   "PAYE information" should "be created from map" in {

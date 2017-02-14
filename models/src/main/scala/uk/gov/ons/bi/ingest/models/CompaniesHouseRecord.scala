@@ -27,7 +27,15 @@ case class SICCode(
   sic_text_2: String,
   sic_text_3: String,
   sic_text_4: String
-)
+) {
+  def fullText = s"$sic_text_1 $sic_text_2 $sic_text_3 $sic_text_4"
+
+  private val NumStartRegex = "(\\d+).*".r
+  def sicCodeNum = fullText match {
+    case NumStartRegex(n) => n.toInt
+    case _ => 0
+  }
+}
 
 case class LimitedPartnerships(
   num_gen_partners: Option[Int],

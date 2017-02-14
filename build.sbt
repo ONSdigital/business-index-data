@@ -67,13 +67,12 @@ lazy val businessIndex = (project in file("."))
   ).aggregate(
     models,
     sparkIngestion
-  ) // .enablePlugins(CrossPerProjectPlugin)
+  )
 
 lazy val sparkIngestion = (project in file("ingestion"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-//      "org.json4s" %% "json4s-native" % Versions.json4s,
       "org.rogach" %% "scallop" % Versions.scallop  ,
       "com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s // ,
 //      "org.apache.spark" %% "spark-core" % Versions.spark,
@@ -91,7 +90,6 @@ lazy val models = (project in file("models"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.2",
       "joda-time" %  "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,
       "org.scalatest" %% "scalatest" % "3.0.0" % Test,

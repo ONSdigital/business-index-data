@@ -3,7 +3,7 @@ package uk.gov.ons.bi.ingest
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.analyzers.{CustomAnalyzerDefinition, KeywordAnalyzer, LowercaseTokenFilter, StandardTokenizer}
 import com.sksamuel.elastic4s.mappings.FieldType.{CompletionType, LongType, StringType}
-import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri, IndexResult}
+import com.sksamuel.elastic4s.{ElasticClient, ElasticsearchClientUri}
 import com.typesafe.config.Config
 import org.elasticsearch.common.settings.Settings
 import org.slf4j.LoggerFactory
@@ -20,7 +20,6 @@ class ElasticImporter(elastic: ElasticClient) {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
 
-
   def initBiIndex(indexName: String) = {
     elastic.execute {
       delete index indexName
@@ -28,50 +27,61 @@ class ElasticImporter(elastic: ElasticClient) {
       logger.info(s"Cleanup completed: $x")
       elastic.execute {
         // define the ElasticSearch index
-        create.index(indexName).mappings(
-          mapping("business").fields(
-            field("BusinessName", StringType) boost 4 analyzer "BusinessNameAnalyzer",
-            field("BusinessName_suggest", CompletionType),
-            field("UPRN", LongType) analyzer KeywordAnalyzer,
-            field("IndustryCode", LongType) analyzer KeywordAnalyzer,
-            field("LegalStatus", StringType) index "not_analyzed" includeInAll false,
-            field("TradingStatus", StringType) index "not_analyzed" includeInAll false,
-            field("Turnover", StringType) index "not_analyzed" includeInAll false,
-            field("EmploymentBands", StringType) index "not_analyzed" includeInAll false
+        create
+          .index(indexName)
+          .mappings(
+            mapping("business").fields(
+              field("BusinessName", StringType) boost 4 analyzer "BusinessNameAnalyzer",
+              field("BusinessName_suggest", CompletionType),
+              field("UPRN", LongType) analyzer KeywordAnalyzer,
+              field("IndustryCode", LongType) analyzer KeywordAnalyzer,
+              field("LegalStatus", StringType) index "not_analyzed" includeInAll false,
+              field("TradingStatus", StringType) index "not_analyzed" includeInAll false,
+              field("Turnover", StringType) index "not_analyzed" includeInAll false,
+              field("EmploymentBands", StringType) index "not_analyzed" includeInAll false
+            )
           )
-        ).analysis(CustomAnalyzerDefinition("BusinessNameAnalyzer",
-          StandardTokenizer,
-          LowercaseTokenFilter,
-          edgeNGramTokenFilter("BusinessNameNGramFilter") minGram 2 maxGram 24)
-        )
+          .analysis(
+            CustomAnalyzerDefinition(
+              "BusinessNameAnalyzer",
+              StandardTokenizer,
+              LowercaseTokenFilter,
+              edgeNGramTokenFilter("BusinessNameNGramFilter") minGram 2 maxGram 24))
       }
     }
   }
 
-  // TODO: include proper logger
+  val BatchSize = sys.props.getOrElse("elastic.importer.batch.size", "1000").toInt
+  val TheadDelays = sys.props.getOrElse("elastic.importer.delay.ms", "5").toInt
 
-  def loadBusinessIndex(indexName: String, d: DataSource[String, BusinessIndex]) = {
-    val r = d.map { bi =>
-      elastic.execute {
-        logger.debug(s"Indexing entry in ElasticSearch $bi")
-        index into indexName / "business" id bi.id fields(
-          "BusinessName" -> bi.name,
-          "UPRN" -> bi.uprn,
-          "IndustryCode" -> bi.industryCode,
-          "LegalStatus" -> bi.legalStatus,
-          "TradingStatus" -> bi.tradingStatus,
-          "Turnover" -> bi.turnover,
-          "EmploymentBands" -> bi.turnover)
+  def loadBusinessIndex(indexName: String,
+                        d: DataSource[String, BusinessIndex]) = {
+    val r = d match {
+      case data: MapDataSource[String, BusinessIndex] => data.data.grouped(BatchSize).map { biMap =>
+        if (TheadDelays > 0) Thread.sleep(TheadDelays)
+        elastic.execute {
+          bulk(
+            biMap.map { case (i, bi) =>
+              logger.debug(s"Indexing entry in ElasticSearch $bi")
+              index into indexName / "business" id bi.id fields("BusinessName" -> bi.name.toUpperCase,
+                "UPRN" -> bi.uprn,
+                "IndustryCode" -> bi.industryCode,
+                "LegalStatus" -> bi.legalStatus,
+                "TradingStatus" -> bi.tradingStatus,
+                "Turnover" -> bi.turnover,
+                "EmploymentBands" -> bi.turnover)
+            }.toSeq)
+        }
       }
     }
-    r match {
-      case mapDS: MapDataSource[String, Future[IndexResult]] => Future.sequence(mapDS.data.values)
-    }
+    Future.sequence(r)
   }
 }
 
-case class ElasticConfiguration(localMode: Boolean, clusterName: String, uri: String, sniffEnabled: Boolean)
-
+case class ElasticConfiguration(localMode: Boolean,
+                                clusterName: String,
+                                uri: String,
+                                sniffEnabled: Boolean)
 
 object BiConfigManager {
 
@@ -99,15 +109,20 @@ object ElasticClientBuilder {
   }
 
   def buildWithConfig(config: ElasticConfiguration) = {
-    val settings = Settings.settingsBuilder().put("client.transport.sniff", config.sniffEnabled)
+    val settings = Settings
+      .settingsBuilder()
+      .put("client.transport.sniff", config.sniffEnabled)
 
     config.localMode match {
       case true =>
-        ElasticClient.local(settings.put("path.home", System.getProperty("java.io.tmpdir")).build())
+        ElasticClient.local(
+          settings
+            .put("path.home", System.getProperty("java.io.tmpdir"))
+            .build())
       case _ =>
-        ElasticClient.transport(settings.put("cluster.name", config.clusterName).build(),
-          ElasticsearchClientUri(config.uri)
-        )
+        ElasticClient.transport(
+          settings.put("cluster.name", config.clusterName).build(),
+          ElasticsearchClientUri(config.uri))
     }
   }
 }

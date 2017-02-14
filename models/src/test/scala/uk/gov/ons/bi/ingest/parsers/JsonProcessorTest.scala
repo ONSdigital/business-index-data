@@ -10,7 +10,7 @@ class JsonProcessorTest extends FlatSpec {
 
   "Map file" should "create proper Map object" in {
     val file = getResource("/links.json").mkString("\n")
-    assert(LinkedFileParser.parse(file).head.size == 20)
+    assert(LinkedFileParser.parse(file).size == 20)
   }
 
 }
