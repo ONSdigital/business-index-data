@@ -20,7 +20,7 @@ trait RecordBuilder[T] {
 
   implicit def config: Config
 
-  protected def IgnoreBrokenRecords = getPropOrElse("ignore.csv.errors", "true").toBoolean
+  protected def ignoreBrokenRecords = getPropOrElse("ignore.csv.errors", "true").toBoolean
 
   def handled(f: => T): Option[T] = {
     try {
@@ -28,7 +28,7 @@ trait RecordBuilder[T] {
     } catch {
       case NonFatal(exc) =>
         val msg = s"Exception while building record ${exc.getMessage}. Data map: $map"
-        if (IgnoreBrokenRecords) { logger.error(msg); None} else throw new RuntimeException(msg, exc)
+        if (ignoreBrokenRecords) { logger.error(msg); None} else throw new RuntimeException(msg, exc)
     }
   }
 

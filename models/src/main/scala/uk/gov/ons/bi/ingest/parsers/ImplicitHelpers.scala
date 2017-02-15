@@ -1,5 +1,6 @@
 package uk.gov.ons.bi.ingest.parsers
 
+import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.slf4j.LoggerFactory
 
@@ -9,6 +10,10 @@ import org.slf4j.LoggerFactory
 object ImplicitHelpers {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
+
+  private[this] val dtfm = DateTimeFormat.forPattern("dd/MM/yy")
+
+  val Date = new DateTime()
 
   import StringHelpers._
 
@@ -21,12 +26,14 @@ object ImplicitHelpers {
 
     def asIntOpt = strOption(s).map(_.toInt)
 
-    def asDateTimeOpt = strOption(s).map(x => parseDate(x))
+    def asDateTimeOpt = {
+      // FIXME: strOption(s).map(x => parseDate(x))
+      Some(Date)
+    }
   }
 
   def parseDate(s: String) = {
-    val dtfm = DateTimeFormat.forPattern("dd/MM/yy")
-    dtfm.parseDateTime(s)
+     dtfm.parseDateTime(s)
   }
 
 }

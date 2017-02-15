@@ -12,13 +12,14 @@ import uk.gov.ons.bi.ingest.process.{DataSource, MapDataSource}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import uk.gov.ons.bi.ingest.helper.Utils._
+
+import scala.util.Try
 
 /**
   * Created by Volodymyr.Glushak on 10/02/2017.
   */
-class ElasticImporter(elastic: ElasticClient) {
+class ElasticImporter(elastic: ElasticClient)(implicit val config: Config) {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
 
@@ -56,6 +57,30 @@ class ElasticImporter(elastic: ElasticClient) {
   val BatchSize = getPropOrElse("elastic.importer.batch.size", "1000").toInt
   val TheadDelays = getPropOrElse("elastic.importer.delay.ms", "5").toInt
 
+  def initializeIndex(businessIndex: String) = {
+    Try(elastic.execute {
+      delete index businessIndex
+    }) // ignore if index doesn't exists
+    elastic.execute {
+      create.index(businessIndex).mappings(
+        mapping("business").fields(
+          field("BusinessName", StringType) boost 4 analyzer "BusinessNameAnalyzer",
+          field("BusinessName_suggest", CompletionType),
+          field("UPRN", LongType) analyzer KeywordAnalyzer,
+          field("IndustryCode", LongType) analyzer KeywordAnalyzer,
+          field("LegalStatus", StringType) index "not_analyzed" includeInAll false,
+          field("TradingStatus", StringType) index "not_analyzed" includeInAll false,
+          field("Turnover", StringType) index "not_analyzed" includeInAll false,
+          field("EmploymentBands", StringType) index "not_analyzed" includeInAll false
+        )
+      ).analysis(CustomAnalyzerDefinition("BusinessNameAnalyzer",
+        StandardTokenizer,
+        LowercaseTokenFilter,
+        edgeNGramTokenFilter("BusinessNameNGramFilter") minGram 2 maxGram 24)
+      )
+    }
+  }
+
   def loadBusinessIndex(indexName: String,
                         d: DataSource[String, BusinessIndex]) = {
     val r = d match {
@@ -81,10 +106,7 @@ class ElasticImporter(elastic: ElasticClient) {
   }
 }
 
-case class ElasticConfiguration(localMode: Boolean,
-                                clusterName: String,
-                                uri: String,
-                                sniffEnabled: Boolean)
+case class ElasticConfiguration(localMode: Boolean, clusterName: String, uri: String, sniffEnabled: Boolean)
 
 object BiConfigManager {
 
@@ -112,20 +134,15 @@ object ElasticClientBuilder {
   }
 
   def buildWithConfig(config: ElasticConfiguration) = {
-    val settings = Settings
-      .settingsBuilder()
-      .put("client.transport.sniff", config.sniffEnabled)
+    val settings = Settings.settingsBuilder().put("client.transport.sniff", config.sniffEnabled)
 
     config.localMode match {
       case true =>
         ElasticClient.local(
-          settings
-            .put("path.home", System.getProperty("java.io.tmpdir"))
-            .build())
+          settings.put("path.home", System.getProperty("java.io.tmpdir")).build())
       case _ =>
         ElasticClient.transport(
-          settings.put("cluster.name", config.clusterName).build(),
-          ElasticsearchClientUri(config.uri))
+          settings.put("cluster.name", config.clusterName).build(), ElasticsearchClientUri(config.uri))
     }
   }
 }

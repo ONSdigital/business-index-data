@@ -47,9 +47,9 @@ class CsvProcessorTest extends FlatBiTest {
     assert(payeMapList.flatten.toSeq.size == 5)
   }
 
-  //  // Performance test ...
-  //  "ALL CH" should "be read and parsed" in {
-  //    val ch = readFile("/Users/Volodymyr.Glushak/Downloads/BasicCompanyData-2017-02-03-part1_5.csv")
-  //    assert(csvToMapToObj(ch, CHBuilder.companyHouseFromMap).length == 850000 - 1)
-  //  }
+    // Performance test ...
+    "ALL CH" should "be read and parsed" in {
+      val ch = readFile("/Users/Volodymyr.Glushak/Downloads/BasicCompanyData-2017-02-03-part1_5.csv")
+      assert(csvToMapToObj(ch, CHBuilder.companyHouseFromMap).length == 850000 - 1)
+    }
 }

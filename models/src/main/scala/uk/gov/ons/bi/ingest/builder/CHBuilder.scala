@@ -112,12 +112,12 @@ class CHBuilder(val map: Map[String, String])(implicit val config: Config) exten
   // PreviousName_10CONDATE,PreviousName_10CompanyName
 
   def previousNamesFromMap = {
-    def getPrevName(i: Int) = {
-      PreviousName(
-        condate = mapFirst(s"PreviousName_${i}CONDATE", s"PreviousName_$i.CONDATE"),
-        company_name = mapFirst(s"PreviousName_${i}CompanyName", s"PreviousName_$i.CompanyName")
-      ).?
-    }
+    def getPrevName(i: Int) = None //FIXME:    {
+//      PreviousName(
+//        condate = mapFirst(s"PreviousName_${i}CONDATE", s"PreviousName_$i.CONDATE"),
+//        company_name = mapFirst(s"PreviousName_${i}CompanyName", s"PreviousName_$i.CompanyName")
+//      ).?
+//    }
     PreviousNames(
       previous_name_1 = getPrevName(1),
       previous_name_2 = getPrevName(2),

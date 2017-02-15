@@ -5,9 +5,10 @@ import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.helper.Utils._
 import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   *
@@ -62,7 +63,10 @@ object BusinessLinkerApp extends App {
   //    println(s"Index created with results $x")
   //    elasticImporter.loadBusinessIndex(biName, busObjs)
   //  }
-  val resFutures = elasticImporter.loadBusinessIndex(biName, busObjs)
+
+  val initialization = getProp("elastic.recreate.index").toBoolean
+  val initFuture = if (initialization) elasticImporter.initializeIndex(biName) else Future.successful()
+  val resFutures = initFuture.flatMap(x => elasticImporter.loadBusinessIndex(biName, busObjs))
   // blocking, for test purposes only
   val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt
   Try(Await.result(resFutures, loadTimeout.seconds)) match {
@@ -71,7 +75,7 @@ object BusinessLinkerApp extends App {
       //        logger.debug(r.original)
       //        logger.debug(s"${r.id} -> created: ${r.isCreated}")
       //      })
-      logger.info(s"Successfully imported data")
+      logger.info(s"Successfully imported data ${ress.toSeq.size}")
     case Failure(err) => logger.error("Unable to import data", err)
   }
 }

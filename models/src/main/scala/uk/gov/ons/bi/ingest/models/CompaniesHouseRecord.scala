@@ -32,8 +32,8 @@ case class SICCode(
 
   private val NumStartRegex = "(\\d+).*".r
   def sicCodeNum = fullText match {
-    case NumStartRegex(n) => n.toInt
-    case _ => 0
+    case NumStartRegex(n) => n.toLong
+    case _ => 0L
   }
 }
 

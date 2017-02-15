@@ -24,7 +24,7 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
   def uprn: Long = cvp.ubrn.toLong
 
   def industryCode: Long = cvp match {
-    case BusinessData(_, ch1 :: tl, _, _) if ch1.sic_code.nonEmpty => ch1.sic_code.get.sicCodeNum
+    case BusinessData(_, ch1 :: tl, _, _) if ch1.sic_code.nonEmpty => ch1.sic_code.map(_.sicCodeNum).getOrElse(0L)
     case BusinessData(_, _, vt :: tl, _) => vt.inqcode.toLong
     case BusinessData(_, _, Nil, py :: tl) => py.inqcode.toLong
     case _ => -1

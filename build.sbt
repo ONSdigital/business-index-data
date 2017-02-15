@@ -11,6 +11,7 @@ lazy val Versions = new {
 
 lazy val commonSettings = Seq(
   scalaVersion := "2.11.8",
+// artifactory:  scapegoatVersion := "1.1.0",
 
   // next properties set required for sbt-assembly plugin,
   // whe it finds two classes with same name in different JARs it does not know what to do
