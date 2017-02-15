@@ -1,5 +1,6 @@
 package uk.gov.ons.bi.ingest.builder
 
+import com.typesafe.config.Config
 import uk.gov.ons.bi.ingest.models.VatRecord
 
 /**
@@ -7,11 +8,12 @@ import uk.gov.ons.bi.ingest.models.VatRecord
   */
 object VATBuilder {
 
-  def vatFromMap(map: Map[String, String]) = new VATBuilder(map).build
+  def vatFromMap(map: Map[String, String])(implicit config: Config) = new VATBuilder(map).build
 
 }
 
-class VATBuilder(val map: Map[String, String]) extends RecordBuilder[VatRecord] {
+class VATBuilder(val map: Map[String, String])(implicit val config: Config) extends RecordBuilder[VatRecord] {
+
   override def build = handled {
     VatRecord(
       entref = map("entref"),

@@ -2,10 +2,7 @@ package uk.gov.ons.bi.ingest.process
 
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
-import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.helper.Utils._
-import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
-import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
 import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 
 import scala.concurrent.Await
@@ -24,7 +21,7 @@ object BusinessLinkerApp extends App {
 
   // elastic search part
 
-  val config = BiConfigManager.envConf(ConfigFactory.load())
+  implicit val config = BiConfigManager.envConf(ConfigFactory.load())
 
   val elasticClient = ElasticClientBuilder.build(config)
 

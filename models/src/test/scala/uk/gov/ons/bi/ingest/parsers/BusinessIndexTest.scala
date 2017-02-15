@@ -1,13 +1,13 @@
 package uk.gov.ons.bi.ingest.parsers
 
-import org.scalatest.FlatSpec
+import uk.gov.ons.bi.ingest.FlatBiTest
 import uk.gov.ons.bi.ingest.helper.Utils._
 import uk.gov.ons.bi.ingest.process.BusinessLinker
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
-class BusinessIndexTest extends FlatSpec {
+class BusinessIndexTest extends FlatBiTest {
 
   "From input data" should "proper business data to be created" in {
 

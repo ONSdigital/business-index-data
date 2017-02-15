@@ -1,5 +1,6 @@
 package uk.gov.ons.bi.ingest.builder
 
+import com.typesafe.config.Config
 import uk.gov.ons.bi.ingest.models._
 
 /**
@@ -7,12 +8,11 @@ import uk.gov.ons.bi.ingest.models._
   */
 object PayeBuilder {
 
-  def payeFromMap(map: Map[String, String]) = new PayeBuilder(map).build
+  def payeFromMap(map: Map[String, String])(implicit config: Config) = new PayeBuilder(map).build
 
 }
 
-class PayeBuilder(val map: Map[String, String])
-    extends RecordBuilder[PayeRecord2] {
+class PayeBuilder(val map: Map[String, String])(implicit val config: Config) extends RecordBuilder[PayeRecord2] {
 
   // entref,payeref,deathcode,birthdate,deathdate,mfullemp,msubemp,ffullemp,fsubemp,unclemp,unclsubemp,
   // dec_jobs,mar_jobs,june_jobs,sept_jobs,

@@ -13,6 +13,8 @@ import uk.gov.ons.bi.ingest.process.{DataSource, MapDataSource}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+import uk.gov.ons.bi.ingest.helper.Utils._
+
 /**
   * Created by Volodymyr.Glushak on 10/02/2017.
   */
@@ -51,8 +53,8 @@ class ElasticImporter(elastic: ElasticClient) {
     }
   }
 
-  val BatchSize = sys.props.getOrElse("elastic.importer.batch.size", "1000").toInt
-  val TheadDelays = sys.props.getOrElse("elastic.importer.delay.ms", "5").toInt
+  val BatchSize = getPropOrElse("elastic.importer.batch.size", "1000").toInt
+  val TheadDelays = getPropOrElse("elastic.importer.delay.ms", "5").toInt
 
   def loadBusinessIndex(indexName: String,
                         d: DataSource[String, BusinessIndex]) = {

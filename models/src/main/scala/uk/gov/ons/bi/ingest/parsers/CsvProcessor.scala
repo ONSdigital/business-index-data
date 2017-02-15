@@ -20,7 +20,7 @@ object CsvProcessor {
   val Delimiter = ",(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)" // coma, ignore quoted comas
   val Eol = System.lineSeparator
 
-  def csvToMapToObj[T](csvString: Iterator[String], f: Map[String, String] => T) = {
+  def csvToMapToObj[T](csvString: Iterator[String], f: Map[String, String] => T, name: String = "records") = {
     val counter = new AtomicInteger(0)
 
     def splt(s: String) = s.split(Delimiter, -1).toList.map(v => unquote(v.trim))
@@ -29,7 +29,7 @@ object CsvProcessor {
 
     val res = csvString.map(dataLine => Future {
       val c = counter.incrementAndGet()
-      if (c % 10000 == 0) logger.debug(s"Processed $c records")
+      if (c % 10000 == 0) logger.debug(s"Processed $c $name")
       val data = splt(dataLine)
       require (header.length == data.length, s"Data size does not reflect header [${header.length} <> ${data.length}]. \n$header \n$data")
       f(header zip data toMap)

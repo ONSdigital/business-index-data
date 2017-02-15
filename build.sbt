@@ -90,6 +90,7 @@ lazy val models = (project in file("models"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % "1.3.1",
       "joda-time" %  "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,
       "org.scalatest" %% "scalatest" % "3.0.0" % Test,

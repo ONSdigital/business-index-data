@@ -2,9 +2,11 @@ package uk.gov.ons.bi.ingest.helper
 
 import java.io.File
 
+import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
 
 import scala.io.Source
+import scala.util.Try
 
 /**
   * Created by Volodymyr.Glushak on 14/02/2017.
@@ -36,5 +38,10 @@ object Utils {
   }
 
   def getResource(file: String) = Source.fromInputStream(getClass.getResourceAsStream(file)).getLines()
+
+
+  def getPropOrElse(name: String, default: => String)(implicit config: Config) = Try(config.getString(name)).getOrElse(default)
+
+  def getProp(name: String)(implicit config: Config) = getPropOrElse(name, sys.error(s"Config $name was not found."))
 
 }

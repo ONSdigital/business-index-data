@@ -72,7 +72,6 @@ case class PreviousNames(
 )
 
 case class CompaniesHouseRecord(
-  id: String,
   company_name: String,
   company_number: String,
   company_category: String,

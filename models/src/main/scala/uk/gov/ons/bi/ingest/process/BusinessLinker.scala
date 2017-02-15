@@ -1,5 +1,6 @@
 package uk.gov.ons.bi.ingest.process
 
+import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
 import uk.gov.ons.bi.ingest.models._
@@ -9,7 +10,7 @@ import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
-class BusinessLinker {
+class BusinessLinker(implicit config: Config) {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
 
@@ -47,11 +48,11 @@ class BusinessLinker {
                        payeStream: Iterator[String],
                        chStream: Iterator[String],
                        linkingData: String) = {
-    val vatMapList = csvToMapToObj(vatStream, VATBuilder.vatFromMap).flatten.map(vt => vt.entref -> vt).toMap
+    val vatMapList = csvToMapToObj(vatStream, VATBuilder.vatFromMap, "vat").flatten.map(vt => vt.entref -> vt).toMap
 
-    val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap).flatten.map(py => py.entref -> py).toMap
+    val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap, "paye").flatten.map(py => py.entref -> py).toMap
 
-    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap).flatten.map(ch => ch.company_number -> ch).toMap
+    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "companyhoses").flatten.map(ch => ch.company_number -> ch).toMap
 
     val links = LinkedFileParser.parse(linkingData).map { lk => lk.ubrn -> lk }.toMap
 

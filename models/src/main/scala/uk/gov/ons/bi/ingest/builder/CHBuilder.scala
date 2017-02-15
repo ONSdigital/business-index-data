@@ -1,23 +1,19 @@
 package uk.gov.ons.bi.ingest.builder
 
-import org.slf4j.LoggerFactory
+import com.typesafe.config.Config
 import uk.gov.ons.bi.ingest.models._
 import uk.gov.ons.bi.ingest.parsers.ImplicitHelpers._
-
-import scala.util.control.NonFatal
-
 
 /**
   * Created by Volodymyr.Glushak on 08/02/2017.
   */
-
 object CHBuilder {
-  def companyHouseFromMap(map: Map[String, String]) = new CHBuilder(map).build
 
-  val IgnoreBrokenRecords = sys.props.getOrElse("ignore.csv.errors", "true").toBoolean
+  def companyHouseFromMap(map: Map[String, String])(implicit config: Config) = new CHBuilder(map).build
+
 }
 
-class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHouseRecord] {
+class CHBuilder(val map: Map[String, String])(implicit val config: Config) extends RecordBuilder[CompaniesHouseRecord] {
 
   def mapFirst(keys: String*) = {
     map(keys.find(k => map.get(k).nonEmpty).getOrElse(sys.error(s"Not found keys $keys in CH map $map")))
@@ -48,7 +44,6 @@ class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHou
 
   def build = handled {
     CompaniesHouseRecord(
-      id = "???",
       company_name = map("CompanyName"),
       company_number = map("CompanyNumber"),
       company_category = map("CompanyCategory"),
@@ -60,7 +55,7 @@ class CHBuilder(val map: Map[String, String]) extends RecordBuilder[CompaniesHou
       returns = returnsFromMap.?,
       sic_code = sicCodeFromMap.?,
       limitedPartnerships = limitedPartnershipFromMap,
-      uri = map("URI").?,
+      uri = None, // save space map("URI").?,
       previous_names = previousNamesFromMap
     )
   }

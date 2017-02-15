@@ -1,6 +1,8 @@
 package uk.gov.ons.bi.ingest.builder
 
+import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
+import uk.gov.ons.bi.ingest.helper.Utils._
 import uk.gov.ons.bi.ingest.models.{Address, PayeName, TradStyle}
 
 import scala.util.control.NonFatal
@@ -16,13 +18,17 @@ trait RecordBuilder[T] {
 
   def build: Option[T]
 
+  implicit def config: Config
+
+  protected def IgnoreBrokenRecords = getPropOrElse("ignore.csv.errors", "true").toBoolean
+
   def handled(f: => T): Option[T] = {
     try {
       Some(f)
     } catch {
       case NonFatal(exc) =>
         val msg = s"Exception while building record ${exc.getMessage}. Data map: $map"
-        if (CHBuilder.IgnoreBrokenRecords) { logger.error(msg); None} else throw new RuntimeException(msg, exc)
+        if (IgnoreBrokenRecords) { logger.error(msg); None} else throw new RuntimeException(msg, exc)
     }
   }
 
