@@ -5,11 +5,12 @@ case class BusinessIndex(
   id: Long, // the same as uprn ?
   name: String,
   uprn: Long,
+  postCode: String,
   industryCode: Long,
   legalStatus: String,
   tradingStatus: String,
   turnover: String,
-  employmentBand: String
+  employmentBand: Int
 ) {
 
   val Delim = ","

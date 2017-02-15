@@ -64,10 +64,10 @@ class PayeBuilder(val map: Map[String, String])(implicit val config: Config) ext
   )
 
   protected def monthJobsFromMap = MonthJobs(
-    dec_jobs = map("dec_jobs"),
-    mar_jobs = map("mar_jobs"),
-    june_jobs = map("june_jobs"),
-    sept_jobs = map("sept_jobs")
+    dec_jobs = map("dec_jobs").toDouble.toInt,
+    mar_jobs = map("mar_jobs").toDouble.toInt,
+    june_jobs = map("june_jobs").toDouble.toInt,
+    sept_jobs = map("sept_jobs").toDouble.toInt
   )
 
 }

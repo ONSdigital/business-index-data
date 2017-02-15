@@ -49,6 +49,7 @@ class CHBuilder(val map: Map[String, String])(implicit val config: Config) exten
       company_category = map("CompanyCategory"),
       company_status = map("CompanyStatus"),
       country_of_origin = map("CountryOfOrigin"),
+      post_code = mapFirst("RegAddress.PostCode", "RegAddressPostCode"),
       dissolution_date = map("DissolutionDate").asDateTimeOpt,
       incorporation_date = map("IncorporationDate").asDateTimeOpt,
       accounts = accountFromMap,

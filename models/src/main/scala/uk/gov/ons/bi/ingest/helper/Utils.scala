@@ -3,6 +3,7 @@ package uk.gov.ons.bi.ingest.helper
 import java.io.File
 
 import com.typesafe.config.Config
+import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 
 import scala.io.Source
@@ -14,6 +15,9 @@ import scala.util.Try
 object Utils {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
+
+  val Month = new DateTime().getMonthOfYear
+
 
   def readFile(filename: String) = {
     logger.info(s"Reading $filename")

@@ -35,6 +35,7 @@ class BusinessLinker(implicit config: Config) {
         id = extractor.uprn,
         name = extractor.companyName,
         uprn = extractor.uprn,
+        postCode = extractor.postCode,
         industryCode = extractor.industryCode,
         legalStatus = extractor.legalStatus,
         tradingStatus = extractor.tradingStatus,
@@ -52,7 +53,7 @@ class BusinessLinker(implicit config: Config) {
 
     val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap, "paye").flatten.map(py => py.entref -> py).toMap
 
-    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "companyhoses").flatten.map(ch => ch.company_number -> ch).toMap
+    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "ch").flatten.map(ch => ch.company_number -> ch).toMap
 
     val links = LinkedFileParser.parse(linkingData).map { lk => lk.ubrn -> lk }.toMap
 

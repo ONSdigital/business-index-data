@@ -67,6 +67,7 @@ class ElasticImporter(elastic: ElasticClient)(implicit val config: Config) {
           field("BusinessName", StringType) boost 4 analyzer "BusinessNameAnalyzer",
           field("BusinessName_suggest", CompletionType),
           field("UPRN", LongType) analyzer KeywordAnalyzer,
+          field("PostCode", StringType) analyzer KeywordAnalyzer,
           field("IndustryCode", LongType) analyzer KeywordAnalyzer,
           field("LegalStatus", StringType) index "not_analyzed" includeInAll false,
           field("TradingStatus", StringType) index "not_analyzed" includeInAll false,
@@ -93,11 +94,12 @@ class ElasticImporter(elastic: ElasticClient)(implicit val config: Config) {
               logger.trace(s"Indexing entry in ElasticSearch $bi")
               index into indexName / "business" id bi.id fields("BusinessName" -> bi.name.toUpperCase,
                 "UPRN" -> bi.uprn,
+                "PostCode" -> bi.postCode,
                 "IndustryCode" -> bi.industryCode,
                 "LegalStatus" -> bi.legalStatus,
                 "TradingStatus" -> bi.tradingStatus,
                 "Turnover" -> bi.turnover,
-                "EmploymentBands" -> bi.employmentBand)
+                "EmploymentBands" -> bi.employmentBand.toString) // fixme: change employmentband type to Int
             }.toSeq)
         }
       }
