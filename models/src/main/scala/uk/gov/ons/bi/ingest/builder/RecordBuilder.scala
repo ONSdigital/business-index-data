@@ -28,7 +28,7 @@ trait RecordBuilder[T] {
     } catch {
       case NonFatal(exc) =>
         val msg = s"Exception while building record ${exc.getMessage}. Data map: $map"
-        if (ignoreBrokenRecords) { logger.error(msg); None} else throw new RuntimeException(msg, exc)
+        if (ignoreBrokenRecords) { logger.error(msg, exc); None} else throw new RuntimeException(msg, exc)
     }
   }
 

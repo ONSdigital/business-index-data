@@ -2,6 +2,7 @@ package uk.gov.ons.bi.ingest.builder
 
 import com.typesafe.config.Config
 import uk.gov.ons.bi.ingest.models._
+import uk.gov.ons.bi.ingest.parsers.ImplicitHelpers._
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
@@ -64,10 +65,10 @@ class PayeBuilder(val map: Map[String, String])(implicit val config: Config) ext
   )
 
   protected def monthJobsFromMap = MonthJobs(
-    dec_jobs = map("dec_jobs").toDouble.toInt,
-    mar_jobs = map("mar_jobs").toDouble.toInt,
-    june_jobs = map("june_jobs").toDouble.toInt,
-    sept_jobs = map("sept_jobs").toDouble.toInt
+    dec_jobs = map("dec_jobs").asIntOpt,
+    mar_jobs = map("mar_jobs").asIntOpt,
+    june_jobs = map("june_jobs").asIntOpt,
+    sept_jobs = map("sept_jobs").asIntOpt
   )
 
 }

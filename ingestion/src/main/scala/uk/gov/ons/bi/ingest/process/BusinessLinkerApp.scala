@@ -68,14 +68,18 @@ object BusinessLinkerApp extends App {
   val initFuture = if (initialization) elasticImporter.initializeIndex(biName) else Future.successful()
   val resFutures = initFuture.flatMap(x => elasticImporter.loadBusinessIndex(biName, busObjs))
   // blocking, for test purposes only
-  val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt
+  val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt // TODO: ???
+
+
   Try(Await.result(resFutures, loadTimeout.seconds)) match {
     case Success(ress) =>
-      //      ress.foreach(r => {
-      //        logger.debug(r.original)
-      //        logger.debug(s"${r.id} -> created: ${r.isCreated}")
-      //      })
-      logger.info(s"Successfully imported data ${ress.toSeq.size}")
+
+      ress.foreach { r =>
+        val cr = r.items
+        // val cr2 = cr.map(ra => ra.indexResult.get.isCreated)
+        logger.info(s"Successfully imported data. Total: ${cr.size}") // , created: ${cr.count(_ == (true))}")
+      }
+
     case Failure(err) => logger.error("Unable to import data", err)
   }
 }

@@ -11,7 +11,7 @@ class CsvProcessorTest extends FlatBiTest {
 
   import CsvProcessor._
 
-  val files = Map("/CH_original.csv" -> 199, "/PAYE_original.csv" -> 5,
+  val files = Map("/CH_original.csv" -> 199, "/PAYE_original.csv" -> 6,
     "/CH_Output.csv" -> 100, "/PAYE_Output.csv" -> 100, "/VAT_Output.csv" -> 100)
 
 
@@ -44,7 +44,7 @@ class CsvProcessorTest extends FlatBiTest {
   "Original PAYE information" should "be correctly parsed" in {
     val paye = getResource("/PAYE_Original.csv")
     val payeMapList = csvToMapToObj(paye, PayeBuilder.payeFromMap, "paye")
-    assert(payeMapList.flatten.toSeq.size == 5)
+    assert(payeMapList.flatten.toSeq.size == 6)
   }
 
 //    // Performance test ...

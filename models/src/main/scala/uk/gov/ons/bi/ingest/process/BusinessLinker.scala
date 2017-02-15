@@ -49,9 +49,9 @@ class BusinessLinker(implicit config: Config) {
                        payeStream: Iterator[String],
                        chStream: Iterator[String],
                        linkingData: String) = {
-    val vatMapList = csvToMapToObj(vatStream, VATBuilder.vatFromMap, "vat").flatten.map(vt => vt.entref -> vt).toMap
+    val vatMapList = csvToMapToObj(vatStream, VATBuilder.vatFromMap, "vat").flatten.map(vt => vt.vatref -> vt).toMap
 
-    val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap, "paye").flatten.map(py => py.entref -> py).toMap
+    val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap, "paye").flatten.map(py => py.payeref -> py).toMap
 
     val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "ch").flatten.map(ch => ch.company_number -> ch).toMap
 

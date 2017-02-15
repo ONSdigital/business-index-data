@@ -22,9 +22,10 @@ object ImplicitHelpers {
   }
 
   implicit class TypedString(s: String) {
+
     def asDateTime = parseDate(s)
 
-    def asIntOpt = strOption(s).map(_.toInt)
+    def asIntOpt = strOption(s).map(_.toDouble.toInt)
 
     def asDateTimeOpt = {
       // FIXME: strOption(s).map(x => parseDate(x))

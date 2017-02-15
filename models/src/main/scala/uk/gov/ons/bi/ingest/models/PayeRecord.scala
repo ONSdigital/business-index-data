@@ -21,13 +21,17 @@ case class PayeName(nameline1: String, nameline2: String, nameline3: String) {
 
 case class TradStyle(tradstyle1: String, tradstyle2: String, tradstyle3: String)
 
-case class MonthJobs(dec_jobs: Int, mar_jobs: Int, june_jobs: Int, sept_jobs: Int) {
+case class MonthJobs(dec_jobs: Option[Int], mar_jobs: Option[Int], june_jobs: Option[Int], sept_jobs: Option[Int]) {
 
-  def recent_jobs = Utils.Month match {
-    case m if m < 3 => dec_jobs
-    case m if m < 6 => mar_jobs
-    case m if m < 9 => june_jobs
-    case _ => sept_jobs
+  def recent_jobs = {
+    val mnthVal = Utils.Month match {
+      case m if m < 3 && dec_jobs.nonEmpty => dec_jobs
+      case m if m < 6 && mar_jobs.nonEmpty => mar_jobs
+      case m if m < 9 && june_jobs.nonEmpty => june_jobs
+      case _ if sept_jobs.nonEmpty => sept_jobs
+      case _ => None
+    }
+    mnthVal.getOrElse(0)
   }
 }
 
