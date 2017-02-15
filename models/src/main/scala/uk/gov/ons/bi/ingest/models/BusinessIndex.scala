@@ -10,7 +10,7 @@ case class BusinessIndex(
   legalStatus: String,
   tradingStatus: String,
   turnover: String,
-  employmentBand: Int
+  employmentBand: String
 ) {
 
   val Delim = ","

@@ -1,6 +1,7 @@
 package uk.gov.ons.bi.ingest.process
 
 import uk.gov.ons.bi.ingest.models.SICCode
+import BandMappings._
 
 /**
   * Created by Volodymyr.Glushak on 14/02/2017.
@@ -38,23 +39,32 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
     case _ => 0L
   }
 
-  def legalStatus: String = cvp match {
-    case BusinessData(_, c1 :: tl, _, _) => c1.company_status
-    case BusinessData(_, Nil, vt :: tl, _) => vt.legalstatus
-    case BusinessData(_, Nil, Nil, py :: tl) => py.legalstatus
-    case _ => ""
+  def legalStatus: String = {
+    val res = cvp match {
+      // case BusinessData(_, c1 :: tl, _, _) => c1.company_status is it trading status ???
+      case BusinessData(_, _, vt :: tl, _) => vt.legalstatus
+      case BusinessData(_, _, Nil, py :: tl) => py.legalstatus
+      case _ => ""
+    }
+    legalStatusBand(res).toString
   }
 
-  def tradingStatus: String = "" // Unknown yet
+  def tradingStatus: String = tradingStatusBand(cvp.c.headOption.map(_.company_status).getOrElse("")) // Unknown yet
 
-  def turnover: String = cvp match {
-    case BusinessData(_, _, vt :: tl, _) => vt.turnover
-    case _ => ""
+  def turnover: String = {
+    val turnover = cvp match {
+      case BusinessData(_, _, vt :: tl, _) => vt.turnover
+      case _ => "0"
+    }
+    turnoverBand(turnover.toLong)
   }
 
-  def exploymentBand: Int = cvp match {
-    case BusinessData(_, _, _, py :: tl) => py.month_jobs.recent_jobs
-    case _ => 0
+  def employment: String = {
+    val emplNum = cvp match {
+      case BusinessData(_, _, _, py :: tl) => py.month_jobs.recent_jobs
+      case _ => 0
+    }
+    employmentBand(emplNum)
   }
 
 }

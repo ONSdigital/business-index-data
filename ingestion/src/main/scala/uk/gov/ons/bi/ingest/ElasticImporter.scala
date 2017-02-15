@@ -99,7 +99,7 @@ class ElasticImporter(elastic: ElasticClient)(implicit val config: Config) {
                 "LegalStatus" -> bi.legalStatus,
                 "TradingStatus" -> bi.tradingStatus,
                 "Turnover" -> bi.turnover,
-                "EmploymentBands" -> bi.employmentBand.toString) // fixme: change employmentband type to Int
+                "EmploymentBands" -> bi.employmentBand)
             }.toSeq)
         }
       }

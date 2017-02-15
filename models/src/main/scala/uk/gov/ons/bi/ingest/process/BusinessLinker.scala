@@ -40,7 +40,7 @@ class BusinessLinker(implicit config: Config) {
         legalStatus = extractor.legalStatus,
         tradingStatus = extractor.tradingStatus,
         turnover = extractor.turnover,
-        employmentBand = extractor.exploymentBand
+        employmentBand = extractor.employment
       )
     }
   }
