@@ -18,7 +18,7 @@ object Utils {
 
   val Month = new DateTime().getMonthOfYear
 
-  val  Day =  new DateTime().getDayOfMonth
+  val  Day2 =  new DateTime().getDayOfMonth
 
 
   def readFile(filename: String) = {
