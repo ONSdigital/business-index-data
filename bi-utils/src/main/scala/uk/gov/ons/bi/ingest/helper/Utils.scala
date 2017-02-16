@@ -18,6 +18,8 @@ object Utils {
 
   val Month = new DateTime().getMonthOfYear
 
+  val  Day =  new DateTime().getDayOfMonth
+
 
   def readFile(filename: String) = {
     logger.info(s"Reading $filename")
