@@ -24,7 +24,7 @@ case class BusinessIndexRec(
 object BusinessIndexRec {
 
   // build business index from elastic search map of fields
-  def fromMap(id: Long, map: Map[String, AnyRef]) = BusinessIndexRec(
+  def fromMap(id: Long, map: Map[String, Any]) = BusinessIndexRec(
     id = id,
     name = map.getOrElse(BiName, EmptyStr).toString,
     uprn = java.lang.Long.parseLong(map.getOrElse(BiUprn, 0L).toString),
@@ -36,7 +36,7 @@ object BusinessIndexRec {
     employmentBand = map.getOrElse(BiEmploymentBand, EmptyStr).toString
   )
 
-  def toMap(bi: BusinessIndexRec) = Map(
+  def toMap(bi: BusinessIndexRec): Map[String, Any] = Map(
     BiName -> bi.name.toUpperCase,
     BiUprn -> bi.uprn,
     BiPostCode -> bi.postCode,
