@@ -66,11 +66,11 @@ lazy val businessIndex = (project in file("."))
     name := "business-index-data",
     moduleName := "business-index-data"
   ).aggregate(
-    models,
-    sparkIngestion
+    biUtils,
+  biIngestion
   )
 
-lazy val sparkIngestion = (project in file("ingestion"))
+lazy val biIngestion = (project in file("bi-ingestion"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
@@ -82,12 +82,12 @@ lazy val sparkIngestion = (project in file("ingestion"))
 //      }
     )
   ).dependsOn(
-    models
+    biUtils
   )
 
 // pure library without any dependencies to elasticsearch or spark
 // in future suppose to be reused in API project
-lazy val models = (project in file("models"))
+lazy val biUtils = (project in file("bi-utils"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
