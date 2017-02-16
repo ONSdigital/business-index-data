@@ -3,6 +3,8 @@ package uk.gov.ons.bi.ingest.process
 import uk.gov.ons.bi.ingest.models.SICCode
 import BandMappings._
 
+import scala.util.Try
+
 /**
   * Created by Volodymyr.Glushak on 14/02/2017.
   */
@@ -40,13 +42,14 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
   }
 
   def legalStatus: String = {
-    val res = cvp match {
+    val r = cvp match {
       // case BusinessData(_, c1 :: tl, _, _) => c1.company_status is it trading status ???
       case BusinessData(_, _, vt :: tl, _) => vt.legalstatus
       case BusinessData(_, _, Nil, py :: tl) => py.legalstatus
-      case _ => ""
+      case _ => "0"
     }
-    legalStatusBand(res).toString
+    // we need to cut decimal part: 1.0, 2.0 => "1", "2"
+    Try(r.toDouble.toInt).getOrElse(0).toString
   }
 
   def tradingStatus: String = tradingStatusBand(cvp.c.headOption.map(_.company_status).getOrElse("")) // Unknown yet
