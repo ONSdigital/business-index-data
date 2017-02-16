@@ -1,7 +1,7 @@
 package uk.gov.ons.bi.ingest.builder
 
 import com.typesafe.config.Config
-import uk.gov.ons.bi.ingest.models._
+import uk.gov.ons.bi.models._
 import uk.gov.ons.bi.ingest.parsers.ImplicitHelpers._
 
 /**

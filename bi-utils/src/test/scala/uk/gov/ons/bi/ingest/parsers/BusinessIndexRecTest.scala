@@ -7,7 +7,7 @@ import uk.gov.ons.bi.ingest.process.BusinessLinker
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.
   */
-class BusinessIndexTest extends FlatBiTest {
+class BusinessIndexRecTest extends FlatBiTest {
 
   "From input data" should "proper business data to be created" in {
 

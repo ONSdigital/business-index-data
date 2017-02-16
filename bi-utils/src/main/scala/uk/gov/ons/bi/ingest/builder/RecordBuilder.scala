@@ -3,7 +3,7 @@ package uk.gov.ons.bi.ingest.builder
 import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.helper.Utils._
-import uk.gov.ons.bi.ingest.models.{Address, PayeName, TradStyle}
+import uk.gov.ons.bi.models.{Address, PayeName, TradStyle}
 
 import scala.util.control.NonFatal
 

@@ -1,7 +1,7 @@
 package uk.gov.ons.bi.ingest.builder
 
 import com.typesafe.config.Config
-import uk.gov.ons.bi.ingest.models.VatRecord
+import uk.gov.ons.bi.models.VatRecord
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.

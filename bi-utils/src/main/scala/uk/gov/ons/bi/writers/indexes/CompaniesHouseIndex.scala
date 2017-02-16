@@ -1,8 +1,8 @@
-package uk.gov.ons.bi.ingest.writers.indexes
+package uk.gov.ons.bi.writers.indexes
 
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.MappingDefinition
-import uk.gov.ons.bi.ingest.writers.Initializer
+import uk.gov.ons.bi.writers.Initializer
 
 class CompaniesHouseIndex extends Initializer {
 

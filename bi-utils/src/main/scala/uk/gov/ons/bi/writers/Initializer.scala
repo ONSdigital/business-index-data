@@ -1,9 +1,9 @@
-package uk.gov.ons.bi.ingest.writers
+package uk.gov.ons.bi.writers
 
 import com.sksamuel.elastic4s.ElasticDsl._
-import com.sksamuel.elastic4s.{CreateIndexDefinition, ElasticClient}
-import com.sksamuel.elastic4s.analyzers.{AnalyzerDefinition, CustomAnalyzerDefinition, LowercaseTokenFilter, StandardTokenizer}
+import com.sksamuel.elastic4s.analyzers.AnalyzerDefinition
 import com.sksamuel.elastic4s.mappings.MappingDefinition
+import com.sksamuel.elastic4s.{CreateIndexDefinition, ElasticClient}
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,6 +25,7 @@ trait Initializer {
 
   /**
     * The name of the given Elastic index.
+    *
     * @return A string holding the index name. This will need to be unique and an error will occur
     *         at runtime when the application lifecycle attempts to create the index.
     */
@@ -34,6 +35,7 @@ trait Initializer {
     * Uses the Elastic4S client DSL to build a specification for a given index.
     * This will basically use a generic index construction mechanism to pre-build
     * the indexes that already exist at the time when the Spark application is executed.
+    *
     * @return A mapping definition.
     */
   def indexDefinition: MappingDefinition
@@ -46,6 +48,7 @@ trait Initializer {
     * A method that given an ElasticSearch client will trigger the creation of the index.
     * This will return a native [[org.elasticsearch.action.admin.indices.create]] that allows
     * checking whether a new index was registered or not.
+    *
     * @param elastic The elastic client, passed through implicitly to avoid code duplication.
     * @return A future wrapping an index creation response.
     */
@@ -59,19 +62,18 @@ object Initializer {
   /**
     * Helper method to allow initialising a few indexes simultaneously using parallel writes.
     * By semantics of Future.sequence, if a single future containing an index creation will fail,
-    *  then the entire operation will fail.
+    * then the entire operation will fail.
     *
     * It's worth nothing if three futures complete and one doesn't, three indexes will be created
     * and the fourth won't, this will not implement any kind of rollback semantics for us.
+    *
     * @param sources The initialise sources for Elastic indexes.
     * @param elastic The implicit Elastic client.
-    * @param ctx The implicit Scala execution context for the operations.
+    * @param ctx     The implicit Scala execution context for the operations.
     * @return A future wrapping a sequence of index creation responses.
     */
-  def apply(sources: Initializer*)(
-    implicit elastic: ElasticClient,
-    ctx: ExecutionContext
-  ): Future[Seq[CreateIndexResponse]] = {
+  def apply(sources: Initializer*)(implicit elastic: ElasticClient, ctx: ExecutionContext):
+  Future[Seq[CreateIndexResponse]] = {
     Future.sequence(sources.map(_.index))
   }
 }

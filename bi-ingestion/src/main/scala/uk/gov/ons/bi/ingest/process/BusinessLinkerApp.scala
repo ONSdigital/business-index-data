@@ -3,12 +3,13 @@ package uk.gov.ons.bi.ingest.process
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.helper.Utils._
-import uk.gov.ons.bi.ingest.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
+import uk.gov.ons.bi.models.BIndexConsts._
+import uk.gov.ons.bi.writers.{BiConfigManager, ElasticClientBuilder, ElasticImporter}
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success, Try}
 
 /**
   *
@@ -24,11 +25,11 @@ object BusinessLinkerApp extends App {
 
   implicit val config = BiConfigManager.envConf(ConfigFactory.load())
 
-  val elasticClient = ElasticClientBuilder.build(config)
+  implicit val elasticClient = ElasticClientBuilder.build(config)
 
-  val elasticImporter = new ElasticImporter(elasticClient)
+  val elasticImporter = new ElasticImporter
 
-  def getProp(name: String) = config.getString(name)
+  def getProp(name: String): String = config.getString(name)
 
   val chPath = getProp("ch.path")
   val payePath = getProp("paye.path")
@@ -49,7 +50,7 @@ object BusinessLinkerApp extends App {
     readFile(linkingPath).mkString("\n")
   )
 
-  val header = """"ID","BusinessName","UPRN","IndustryCode","LegalStatus","TradingStatus","Turnover","EmploymentBands""""
+  val header = s""""ID","$BiName","$BiUprn","$BiIndustryCode","$BiLegalStatus","$BiTradingStatus","$BiTurnover","$BiEmploymentBand""""
 
   printToFile(outPath) { writer =>
     writer.println(header)
@@ -66,10 +67,9 @@ object BusinessLinkerApp extends App {
 
   val initialization = getProp("elastic.recreate.index").toBoolean
   val initFuture = if (initialization) elasticImporter.initializeIndex(biName) else Future.successful()
-  val resFutures = initFuture.flatMap(x => elasticImporter.loadBusinessIndex(biName, busObjs))
+  val resFutures = initFuture.flatMap(x => elasticImporter.loadBusinessIndexFromMapDS(biName, busObjs))
   // blocking, for test purposes only
   val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt // TODO: ???
-
 
   Try(Await.result(resFutures, loadTimeout.seconds)) match {
     case Success(ress) =>

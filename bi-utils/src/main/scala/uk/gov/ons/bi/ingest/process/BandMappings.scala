@@ -6,7 +6,7 @@ package uk.gov.ons.bi.ingest.process
 object BandMappings {
 
 
-  def employmentBand(z: Int) = z match {
+  def employmentBand(z: Int): String = z match {
     case 0 => "A"
     case 1 => "B"
     case x if x < 5 => "C"
@@ -26,7 +26,7 @@ object BandMappings {
 
   }
 
-  def turnoverBand(z: Long) = z match {
+  def turnoverBand(z: Long): String = z match {
     case x if x < 100 => "A"
     case x if x < 250 => "B"
     case x if x < 500 => "C"
@@ -38,7 +38,7 @@ object BandMappings {
     case _ => "I"
   }
 
-  def legalStatusBand(s: String) = s match {
+  def legalStatusBand(s: String): Int = s match {
     case "Company" => 1
     case "Sole Proprietor" => 2
     case "Partnership" => 3
@@ -50,7 +50,7 @@ object BandMappings {
     case _ => 0
   }
 
-  def tradingStatusBand(s: String) = s match {
+  def tradingStatusBand(s: String): String = s match {
     case "Active" => "A"
     case "Closed" => "C"
     case "Dormant" => "D"

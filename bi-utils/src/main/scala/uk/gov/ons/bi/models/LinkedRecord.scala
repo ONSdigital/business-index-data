@@ -1,4 +1,4 @@
-package uk.gov.ons.bi.ingest.models
+package uk.gov.ons.bi.models
 
 /*
 

@@ -2,7 +2,7 @@ package uk.gov.ons.bi.ingest.parsers
 
 import org.json4s._
 import org.json4s.native.JsonMethods
-import uk.gov.ons.bi.ingest.models.LinkedRecord
+import uk.gov.ons.bi.models.LinkedRecord
 
 /**
   * Created by Volodymyr.Glushak on 09/02/2017.

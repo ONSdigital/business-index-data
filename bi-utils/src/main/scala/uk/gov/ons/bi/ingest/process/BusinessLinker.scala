@@ -3,7 +3,7 @@ package uk.gov.ons.bi.ingest.process
 import com.typesafe.config.Config
 import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
-import uk.gov.ons.bi.ingest.models._
+import uk.gov.ons.bi.models._
 import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.ingest.parsers.LinkedFileParser
 
@@ -17,7 +17,7 @@ class BusinessLinker(implicit config: Config) {
   def buildLink(linking: DataSource[String, LinkedRecord],
                 vat: DataSource[String, VatRecord],
                 paye: DataSource[String, PayeRecord2],
-                ch: DataSource[String, CompaniesHouseRecord]): DataSource[String, BusinessIndex] = {
+                ch: DataSource[String, CompaniesHouseRecord]): DataSource[String, BusinessIndexRec] = {
     linking.map { x => {
       val compHouseRec = x.ch.flatMap(ch.getById)
       val payeRec = x.paye.flatMap(paye.getById)
@@ -31,7 +31,7 @@ class BusinessLinker(implicit config: Config) {
       case _ => true
     }).map { extractor =>
 
-      BusinessIndex(
+      BusinessIndexRec(
         id = extractor.uprn,
         name = extractor.companyName,
         uprn = extractor.uprn,

@@ -16,19 +16,16 @@ object Utils {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
 
-  val Month = new DateTime().getMonthOfYear
+  val CurrentMonth = new DateTime().getMonthOfYear
 
-  val  Day2 =  new DateTime().getDayOfMonth
-
-
-  def readFile(filename: String) = {
+  def readFile(filename: String): Iterator[String] = {
     logger.info(s"Reading $filename")
     val res = Source.fromFile(filename).getLines
     // res.length go to the end of iterator ... logger.info(s"File $filename contains ${res.length} lines.")
     res
   }
 
-  def writeToFile(name: String, content: String) = {
+  def writeToFile(name: String, content: String): Unit = {
     printToFile(name) { x =>
       x.println(content)
     }
@@ -43,11 +40,14 @@ object Utils {
     }
   }
 
-  def getResource(file: String) = Source.fromInputStream(getClass.getResourceAsStream(file)).getLines()
+  def getResource(file: String): Iterator[String] =
+    Source.fromInputStream(getClass.getResourceAsStream(file)).getLines()
 
 
-  def getPropOrElse(name: String, default: => String)(implicit config: Config) = Try(config.getString(name)).getOrElse(default)
+  def getPropOrElse(name: String, default: => String)(implicit config: Config): String =
+    Try(config.getString(name)).getOrElse(default)
 
-  def getProp(name: String)(implicit config: Config) = getPropOrElse(name, sys.error(s"Config $name was not found."))
+  def getProp(name: String)(implicit config: Config): String =
+    getPropOrElse(name, sys.error(s"Config $name was not found."))
 
 }

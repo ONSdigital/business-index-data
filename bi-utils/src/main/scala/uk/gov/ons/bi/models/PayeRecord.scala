@@ -1,4 +1,4 @@
-package uk.gov.ons.bi.ingest.models
+package uk.gov.ons.bi.models
 
 import java.util.{Calendar, Date}
 
@@ -24,7 +24,7 @@ case class TradStyle(tradstyle1: String, tradstyle2: String, tradstyle3: String)
 case class MonthJobs(dec_jobs: Option[Int], mar_jobs: Option[Int], june_jobs: Option[Int], sept_jobs: Option[Int]) {
 
   def recent_jobs = {
-    val mnthVal = Utils.Month match {
+    val mnthVal = Utils.CurrentMonth match {
       case m if m < 3 && dec_jobs.nonEmpty => dec_jobs
       case m if m < 6 && mar_jobs.nonEmpty => mar_jobs
       case m if m < 9 && june_jobs.nonEmpty => june_jobs

@@ -1,6 +1,6 @@
 package uk.gov.ons.bi.ingest.process
 
-import uk.gov.ons.bi.ingest.models.SICCode
+import uk.gov.ons.bi.models.SICCode
 import BandMappings._
 
 import scala.util.Try
