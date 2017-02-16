@@ -20,7 +20,7 @@ class BusinessIndexRecTest extends FlatBiTest {
 
     busObjs.foreach(x => {
       assert(x.id > 0, "Id populated")
-      assert(x.name.nonEmpty, "Non empty company name")
+      assert(x.businessName.nonEmpty, "Non empty company name")
     })
 
   }
