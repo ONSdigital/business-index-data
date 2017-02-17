@@ -42,7 +42,7 @@ class CsvProcessorTest extends FlatBiTest {
   }
 
   "Original PAYE information" should "be correctly parsed" in {
-    val paye = getResource("/PAYE_Original.csv")
+    val paye = getResource("/PAYE_original.csv")
     val payeMapList = csvToMapToObj(paye, PayeBuilder.payeFromMap, "paye")
     assert(payeMapList.flatten.toSeq.size == 6)
   }
