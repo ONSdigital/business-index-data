@@ -10,11 +10,37 @@ lazy val Versions = new {
 }
 
 lazy val commonSettings = Seq(
+  scalaVersion := "2.11.8",
+  // artifactory:  scapegoatVersion := "1.1.0",
+
+  // next properties set required for sbt-assembly plugin,
+  // whe it finds two classes with same name in different JARs it does not know what to do
+  // we're defining merge strategy for problematic classes (mostly it's spark deps)
+  assemblyMergeStrategy in assembly := {
+    case PathList("javax", "servlet", xs@_*) => MergeStrategy.last
+    case PathList("javax", "activation", xs@_*) => MergeStrategy.last
+    case PathList("org", "apache", xs@_*) => MergeStrategy.last
+    case PathList("org", "slf4j", xs@_*) => MergeStrategy.last
+    case PathList("org", "joda", xs@_*) => MergeStrategy.last
+    case PathList("com", "google", xs@_*) => MergeStrategy.last
+    case PathList("com", "esotericsoftware", xs@_*) => MergeStrategy.last
+    case PathList("com", "codahale", xs@_*) => MergeStrategy.last
+    case PathList("com", "yammer", xs@_*) => MergeStrategy.last
+    case "about.html" => MergeStrategy.rename
+    case "META-INF/ECLIPSEF.RSA" => MergeStrategy.last
+    case "META-INF/mailcap" => MergeStrategy.last
+    case "META-INF/mimetypes.default" => MergeStrategy.last
+    case "plugin.properties" => MergeStrategy.last
+    case "log4j.properties" => MergeStrategy.last
+    case x =>
+      val oldStrategy = (assemblyMergeStrategy in assembly).value
+      oldStrategy(x)
+  },
   resolvers ++= Seq(
     "splunk" at "http://splunk.artifactoryonline.com/splunk/ext-releases-local"
   ),
   scalacOptions in ThisBuild ++= Seq(
-    "-encoding","UTF-8",
+    "-encoding", "UTF-8",
     "-language:reflectiveCalls",
     "-language:experimental.macros",
     "-language:implicitConversions",
@@ -35,40 +61,43 @@ lazy val commonSettings = Seq(
 )
 
 lazy val businessIndex = (project in file("."))
-	.settings(commonSettings: _*)
+  .settings(commonSettings: _*)
   .settings(
     name := "business-index-data",
     moduleName := "business-index-data"
   ).aggregate(
-    models,
-    sparkIngestion
-  ).enablePlugins(CrossPerProjectPlugin)
+  biUtils,
+  biIngestion
+)
 
-lazy val sparkIngestion = (project in file("ingestion"))
+lazy val biIngestion = (project in file("bi-ingestion"))
   .settings(commonSettings: _*)
   .settings(
-    // FIXME: crossScalaVersions := Seq("2.10.6"),
     libraryDependencies ++= Seq(
-      "org.json4s" %% "json4s-native" % Versions.json4s,
-      "org.rogach" %% "scallop" % Versions.scallop,
-      "com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s,
-      "org.apache.spark" %% "spark-core" % Versions.spark,
-      "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
-        ExclusionRule(organization = "javax.servlet")
-      }
+      "org.rogach" %% "scallop" % Versions.scallop
+      // ,
+      //      "org.apache.spark" %% "spark-core" % Versions.spark,
+      //      "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
+      //        ExclusionRule(organization = "javax.servlet")
+      //      }
     )
   ).dependsOn(
-    models
-  ).enablePlugins(CrossPerProjectPlugin)
+  biUtils
+)
 
-lazy val models = (project in file("models"))
+// pure library without any dependencies to elasticsearch or spark
+// in future suppose to be reused in API project
+lazy val biUtils = (project in file("bi-utils"))
   .settings(commonSettings: _*)
   .settings(
-    // FIXME: crossScalaVersions := Seq("2.10.6", "2.11.8"),
     libraryDependencies ++= Seq(
-      "joda-time" %  "joda-time" % Versions.joda,
+      "com.typesafe" % "config" % "1.3.1",
+      "com.sksamuel.elastic4s" %% "elastic4s-streams" % Versions.elastic4s exclude("org.scalactic", "scalactic_2.11"),
+      "joda-time" % "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,
-      "org.scalatest" %% "scalatest" % "3.0.0"
-
+      "org.scalatest" %% "scalatest" % "3.0.0" % Test,
+      "org.slf4j" % "slf4j-api" % "1.7.22",
+      "ch.qos.logback" % "logback-classic" % "1.1.7"
     )
-  ).enablePlugins(CrossPerProjectPlugin)
+  )
+
