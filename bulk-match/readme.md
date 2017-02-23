@@ -30,19 +30,25 @@ There was applied set of changes to be able generate file names similar to input
 Logic is the following:
 
 1. csv file uploaded to origin folder
+```shell
 $DATA_HOME/origin/<file_name>.csv
+```
 2. Processing executes...
 3. Temp files created by StreamSets in temp folder (each file limited to batch size).
  Original filename is used as a directory name (the only configurable option for FS Output)
+ ```shell
     $DATA_HOME/tmp/<file_name>.csv/some_prefix-uuid-1
     $DATA_HOME/tmp/<file_name>.csv/some_prefix-uuid-2
     $DATA_HOME/tmp/<file_name>.csv/some_prefix-uuid-3
     etc...
+    ```
 Batch size configured to 10k records max.
 4. Temp file renamed based on original file name:
+```shell
     $DATA_HOME/tmp/<file_name>-out.1.csv
     $DATA_HOME/tmp/<file_name>-out.2.csv
     $DATA_HOME/tmp/<file_name>-out.3.csv
     etc...
+    ```
 
 
