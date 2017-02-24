@@ -53,4 +53,10 @@ Batch size configured to 10k records max.
     etc...
 ```
 
+### Input data
+One column CSV with header.
+Supported headers: BusinessName, IndustryCode, VAT(no backend).
+If header is unknown - file is ignored.
+If there are no results for particular record (either BusinessName or IndustryCode) - record is ignored.
+
 
