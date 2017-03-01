@@ -2,7 +2,7 @@
   "pipelineConfig" : {
     "schemaVersion" : 2,
     "version" : 5,
-    "uuid" : "3bc04ef5-b400-4e5a-81ea-d187877d54d8",
+    "uuid" : "01ac135a-1816-4c3b-af6a-a9e86f8528cf",
     "title" : "Bulk Match: csv based",
     "description" : "",
     "configuration" : [ {
@@ -288,7 +288,7 @@
         "value" : "TO_ERROR"
       } ],
       "uiInfo" : {
-        "yPos" : 50,
+        "yPos" : 120.6944351196289,
         "stageType" : "SOURCE",
         "rawSource" : {
           "configuration" : [ {
@@ -298,7 +298,7 @@
         },
         "description" : "",
         "label" : "Input DIR",
-        "xPos" : 60
+        "xPos" : -67.60416412353516
       },
       "inputLanes" : [ ],
       "outputLanes" : [ "Directory_01OutputLane14876112327310" ],
@@ -311,6 +311,9 @@
       "configuration" : [ {
         "name" : "lanePredicates",
         "value" : [ {
+          "outputLane" : "StreamSelector_02OutputLane1488384783392",
+          "predicate" : "${record:value('/PAYE') != NULL}"
+        }, {
           "outputLane" : "StreamSelector_02OutputLane1487773226172",
           "predicate" : "${record:value('/BusinessName') != NULL}"
         }, {
@@ -336,12 +339,12 @@
       "uiInfo" : {
         "description" : "",
         "label" : "What Field?",
-        "xPos" : 280,
-        "yPos" : 170,
+        "xPos" : 191.6666717529297,
+        "yPos" : 290.1736145019531,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "Directory_01OutputLane14876112327310" ],
-      "outputLanes" : [ "StreamSelector_02OutputLane1487773226172", "StreamSelector_02OutputLane1487773151235", "StreamSelector_02OutputLane1487773142290", "StreamSelector_02OutputLane1487773109875" ],
+      "outputLanes" : [ "StreamSelector_02OutputLane1488384783392", "StreamSelector_02OutputLane1487773226172", "StreamSelector_02OutputLane1487773151235", "StreamSelector_02OutputLane1487773142290", "StreamSelector_02OutputLane1487773109875" ],
       "eventLanes" : [ ]
     }, {
       "instanceName" : "ExpressionEvaluator_01",
@@ -352,7 +355,7 @@
         "name" : "expressionProcessorConfigs",
         "value" : [ {
           "fieldToSet" : "/request",
-          "expression" : "IndustryCode=${record:value('/IndustryCode')}"
+          "expression" : "IndustryCode:${record:value('/IndustryCode')}"
         } ]
       }, {
         "name" : "headerAttributeConfigs",
@@ -376,7 +379,7 @@
         "description" : "",
         "label" : "IndustryCode",
         "xPos" : 500,
-        "yPos" : 154,
+        "yPos" : 300,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773151235" ],
@@ -391,7 +394,7 @@
         "name" : "expressionProcessorConfigs",
         "value" : [ {
           "fieldToSet" : "/request",
-          "expression" : "VAT=${record:value('/VAT')}"
+          "expression" : "VatRefs:${record:value('/VAT')}"
         } ]
       }, {
         "name" : "headerAttributeConfigs",
@@ -414,8 +417,8 @@
       "uiInfo" : {
         "description" : "",
         "label" : "VAT",
-        "xPos" : 498,
-        "yPos" : 308,
+        "xPos" : 500,
+        "yPos" : 430,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773142290" ],
@@ -431,7 +434,7 @@
         "value" : "BATCH"
       }, {
         "name" : "script",
-        "value" : "for (record in records) {\n  try {\n    record.value['request'] = 'BusinessName=\\\"'+URLEncoder.encode(record.value['BusinessName'], 'UTF-8') + '\\\"'\n    output.write(record)\n  } catch (e) {\n    log.error(e.toString(), e)\n    error.write(record, e.toString())\n  }\n}"
+        "value" : "for (record in records) {\n  try {\n    record.value['request'] = 'BusinessName:\\\"'+URLEncoder.encode(record.value['BusinessName'], 'UTF-8') + '\\\"' + '?limit=3'\n    output.write(record)\n  } catch (e) {\n    log.error(e.toString(), e)\n    error.write(record, e.toString())\n  }\n}"
       }, {
         "name" : "stageOnRecordError",
         "value" : "TO_ERROR"
@@ -445,12 +448,51 @@
       "uiInfo" : {
         "description" : "",
         "label" : "Encode BusinessName",
-        "xPos" : 495.6904296875,
-        "yPos" : 45.896827697753906,
+        "xPos" : 500,
+        "yPos" : 170,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773226172" ],
       "outputLanes" : [ "GroovyEvaluator_02OutputLane14878574705770" ],
+      "eventLanes" : [ ]
+    }, {
+      "instanceName" : "ExpressionEvaluator_05",
+      "library" : "streamsets-datacollector-basic-lib",
+      "stageName" : "com_streamsets_pipeline_stage_processor_expression_ExpressionDProcessor",
+      "stageVersion" : "2",
+      "configuration" : [ {
+        "name" : "expressionProcessorConfigs",
+        "value" : [ {
+          "fieldToSet" : "/request",
+          "expression" : "PayeRefs:${record:value('/PAYE')}"
+        } ]
+      }, {
+        "name" : "headerAttributeConfigs",
+        "value" : [ { } ]
+      }, {
+        "name" : "fieldAttributeConfigs",
+        "value" : [ {
+          "fieldToSet" : "/"
+        } ]
+      }, {
+        "name" : "stageOnRecordError",
+        "value" : "TO_ERROR"
+      }, {
+        "name" : "stageRequiredFields",
+        "value" : [ ]
+      }, {
+        "name" : "stageRecordPreconditions",
+        "value" : [ ]
+      } ],
+      "uiInfo" : {
+        "description" : "",
+        "label" : "PAYE",
+        "xPos" : 500,
+        "yPos" : 40,
+        "stageType" : "PROCESSOR"
+      },
+      "inputLanes" : [ "StreamSelector_02OutputLane1488384783392" ],
+      "outputLanes" : [ "ExpressionEvaluator_05OutputLane14883847536430" ],
       "eventLanes" : [ ]
     }, {
       "instanceName" : "HTTPClient_01",
@@ -764,11 +806,11 @@
       "uiInfo" : {
         "description" : "",
         "label" : "BI-API",
-        "xPos" : 722.1032104492188,
-        "yPos" : 170,
+        "xPos" : 720,
+        "yPos" : 300,
         "stageType" : "PROCESSOR"
       },
-      "inputLanes" : [ "ExpressionEvaluator_01OutputLane14877729523510", "ExpressionEvaluator_02OutputLane14877731627620", "GroovyEvaluator_02OutputLane14878574705770" ],
+      "inputLanes" : [ "ExpressionEvaluator_01OutputLane14877729523510", "ExpressionEvaluator_02OutputLane14877731627620", "GroovyEvaluator_02OutputLane14878574705770", "ExpressionEvaluator_05OutputLane14883847536430" ],
       "outputLanes" : [ "HTTPClient_01OutputLane14876112452200" ],
       "eventLanes" : [ ]
     }, {
@@ -799,7 +841,7 @@
         "description" : "",
         "label" : "No Response",
         "xPos" : 940,
-        "yPos" : 170,
+        "yPos" : 300,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "HTTPClient_01OutputLane14876112452200" ],
@@ -813,9 +855,9 @@
       "configuration" : [ ],
       "uiInfo" : {
         "description" : "",
-        "label" : "Trash",
-        "xPos" : 1199.269775390625,
-        "yPos" : 378.8254089355469,
+        "label" : "Replace with writing in file",
+        "xPos" : 1160,
+        "yPos" : 560,
         "stageType" : "TARGET"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773109875", "StreamSelector_03OutputLane1487856820821" ],
@@ -843,7 +885,7 @@
         "description" : "",
         "label" : "Drop Tech",
         "xPos" : 1160,
-        "yPos" : 160,
+        "yPos" : 290,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_03OutputLane1487856835497" ],
@@ -885,8 +927,8 @@
       "uiInfo" : {
         "description" : "",
         "label" : "Response Pivoter",
-        "xPos" : 1380,
-        "yPos" : 160,
+        "xPos" : 1382.5,
+        "yPos" : 287.5,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "FieldRemover_01OutputLane14877740224980" ],
@@ -920,7 +962,7 @@
         "description" : "",
         "label" : "Response Flattener",
         "xPos" : 1600,
-        "yPos" : 160,
+        "yPos" : 290,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "FieldPivoter_01OutputLane14877753317630" ],
@@ -962,7 +1004,7 @@
         "description" : "",
         "label" : "Map To List-Map",
         "xPos" : 1820,
-        "yPos" : 160,
+        "yPos" : 290,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "FieldFlattener_01OutputLane14877754324710" ],
@@ -1158,7 +1200,7 @@
         "description" : "",
         "label" : "Output TEMP",
         "xPos" : 2040,
-        "yPos" : 157.89682006835938,
+        "yPos" : 290,
         "stageType" : "TARGET"
       },
       "inputLanes" : [ "ExpressionEvaluator_04OutputLane14877759530360" ],
@@ -1189,7 +1231,7 @@
         "description" : "",
         "label" : "File Rename",
         "xPos" : 2260,
-        "yPos" : 310,
+        "yPos" : 440,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "HadoopFS_01_EventLane" ],
@@ -1265,7 +1307,7 @@
         "description" : "",
         "label" : "Output DIR",
         "xPos" : 2480,
-        "yPos" : 310,
+        "yPos" : 440,
         "stageType" : "EXECUTOR"
       },
       "inputLanes" : [ "GroovyEvaluator_01OutputLane14878415690740" ],
@@ -1306,11 +1348,11 @@
       "title" : "Bulk Match: csv based",
       "description" : "",
       "created" : 1487769041581,
-      "lastModified" : 1487864486245,
+      "lastModified" : 1488385812155,
       "creator" : "admin",
       "lastModifier" : "admin",
       "lastRev" : "0",
-      "uuid" : "3bc04ef5-b400-4e5a-81ea-d187877d54d8",
+      "uuid" : "01ac135a-1816-4c3b-af6a-a9e86f8528cf",
       "valid" : true,
       "metadata" : {
         "labels" : [ ]
@@ -1320,12 +1362,12 @@
       "labels" : [ ]
     },
     "statsAggregatorStage" : null,
-    "previewable" : true,
     "issues" : {
       "pipelineIssues" : [ ],
       "stageIssues" : { },
       "issueCount" : 0
     },
+    "previewable" : true,
     "valid" : true
   },
   "pipelineRules" : {
