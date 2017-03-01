@@ -2,7 +2,7 @@
   "pipelineConfig" : {
     "schemaVersion" : 2,
     "version" : 5,
-    "uuid" : "01ac135a-1816-4c3b-af6a-a9e86f8528cf",
+    "uuid" : "fc2139f5-5541-47ec-b6f4-5472ab69f86d",
     "title" : "Bulk Match: csv based",
     "description" : "",
     "configuration" : [ {
@@ -66,7 +66,7 @@
     "uiInfo" : {
       "previewConfig" : {
         "previewSource" : "CONFIGURED_SOURCE",
-        "batchSize" : "1000",
+        "batchSize" : "10",
         "timeout" : 10000,
         "writeToDestinations" : false,
         "showHeader" : false,
@@ -261,7 +261,7 @@
         "value" : 128
       }, {
         "name" : "conf.batchSize",
-        "value" : 10000
+        "value" : 200000
       }, {
         "name" : "conf.poolingTimeoutSecs",
         "value" : 30
@@ -288,7 +288,7 @@
         "value" : "TO_ERROR"
       } ],
       "uiInfo" : {
-        "yPos" : 120.6944351196289,
+        "yPos" : 50,
         "stageType" : "SOURCE",
         "rawSource" : {
           "configuration" : [ {
@@ -298,7 +298,7 @@
         },
         "description" : "",
         "label" : "Input DIR",
-        "xPos" : -67.60416412353516
+        "xPos" : 60
       },
       "inputLanes" : [ ],
       "outputLanes" : [ "Directory_01OutputLane14876112327310" ],
@@ -311,6 +311,9 @@
       "configuration" : [ {
         "name" : "lanePredicates",
         "value" : [ {
+          "outputLane" : "StreamSelector_02OutputLane1488386186746",
+          "predicate" : "${record:value('/PostCode') != NULL}"
+        }, {
           "outputLane" : "StreamSelector_02OutputLane1488384783392",
           "predicate" : "${record:value('/PAYE') != NULL}"
         }, {
@@ -339,12 +342,12 @@
       "uiInfo" : {
         "description" : "",
         "label" : "What Field?",
-        "xPos" : 191.6666717529297,
-        "yPos" : 290.1736145019531,
+        "xPos" : 280,
+        "yPos" : 230,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "Directory_01OutputLane14876112327310" ],
-      "outputLanes" : [ "StreamSelector_02OutputLane1488384783392", "StreamSelector_02OutputLane1487773226172", "StreamSelector_02OutputLane1487773151235", "StreamSelector_02OutputLane1487773142290", "StreamSelector_02OutputLane1487773109875" ],
+      "outputLanes" : [ "StreamSelector_02OutputLane1488386186746", "StreamSelector_02OutputLane1488384783392", "StreamSelector_02OutputLane1487773226172", "StreamSelector_02OutputLane1487773151235", "StreamSelector_02OutputLane1487773142290", "StreamSelector_02OutputLane1487773109875" ],
       "eventLanes" : [ ]
     }, {
       "instanceName" : "ExpressionEvaluator_01",
@@ -379,7 +382,7 @@
         "description" : "",
         "label" : "IndustryCode",
         "xPos" : 500,
-        "yPos" : 300,
+        "yPos" : 430,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773151235" ],
@@ -418,7 +421,7 @@
         "description" : "",
         "label" : "VAT",
         "xPos" : 500,
-        "yPos" : 430,
+        "yPos" : 560,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773142290" ],
@@ -449,7 +452,7 @@
         "description" : "",
         "label" : "Encode BusinessName",
         "xPos" : 500,
-        "yPos" : 170,
+        "yPos" : 300,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773226172" ],
@@ -488,11 +491,50 @@
         "description" : "",
         "label" : "PAYE",
         "xPos" : 500,
-        "yPos" : 40,
+        "yPos" : 170,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1488384783392" ],
       "outputLanes" : [ "ExpressionEvaluator_05OutputLane14883847536430" ],
+      "eventLanes" : [ ]
+    }, {
+      "instanceName" : "ExpressionEvaluator_06",
+      "library" : "streamsets-datacollector-basic-lib",
+      "stageName" : "com_streamsets_pipeline_stage_processor_expression_ExpressionDProcessor",
+      "stageVersion" : "2",
+      "configuration" : [ {
+        "name" : "expressionProcessorConfigs",
+        "value" : [ {
+          "fieldToSet" : "/request",
+          "expression" : "PostCode:${record:value('/PostCode')}"
+        } ]
+      }, {
+        "name" : "headerAttributeConfigs",
+        "value" : [ { } ]
+      }, {
+        "name" : "fieldAttributeConfigs",
+        "value" : [ {
+          "fieldToSet" : "/"
+        } ]
+      }, {
+        "name" : "stageOnRecordError",
+        "value" : "TO_ERROR"
+      }, {
+        "name" : "stageRequiredFields",
+        "value" : [ ]
+      }, {
+        "name" : "stageRecordPreconditions",
+        "value" : [ ]
+      } ],
+      "uiInfo" : {
+        "description" : "",
+        "label" : "PostCode",
+        "xPos" : 500,
+        "yPos" : 40,
+        "stageType" : "PROCESSOR"
+      },
+      "inputLanes" : [ "StreamSelector_02OutputLane1488386186746" ],
+      "outputLanes" : [ "ExpressionEvaluator_06OutputLane14883861965780" ],
       "eventLanes" : [ ]
     }, {
       "instanceName" : "HTTPClient_01",
@@ -807,10 +849,10 @@
         "description" : "",
         "label" : "BI-API",
         "xPos" : 720,
-        "yPos" : 300,
+        "yPos" : 430,
         "stageType" : "PROCESSOR"
       },
-      "inputLanes" : [ "ExpressionEvaluator_01OutputLane14877729523510", "ExpressionEvaluator_02OutputLane14877731627620", "GroovyEvaluator_02OutputLane14878574705770", "ExpressionEvaluator_05OutputLane14883847536430" ],
+      "inputLanes" : [ "ExpressionEvaluator_01OutputLane14877729523510", "ExpressionEvaluator_02OutputLane14877731627620", "GroovyEvaluator_02OutputLane14878574705770", "ExpressionEvaluator_05OutputLane14883847536430", "ExpressionEvaluator_06OutputLane14883861965780" ],
       "outputLanes" : [ "HTTPClient_01OutputLane14876112452200" ],
       "eventLanes" : [ ]
     }, {
@@ -841,7 +883,7 @@
         "description" : "",
         "label" : "No Response",
         "xPos" : 940,
-        "yPos" : 300,
+        "yPos" : 430,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "HTTPClient_01OutputLane14876112452200" ],
@@ -857,7 +899,7 @@
         "description" : "",
         "label" : "Replace with writing in file",
         "xPos" : 1160,
-        "yPos" : 560,
+        "yPos" : 690,
         "stageType" : "TARGET"
       },
       "inputLanes" : [ "StreamSelector_02OutputLane1487773109875", "StreamSelector_03OutputLane1487856820821" ],
@@ -885,7 +927,7 @@
         "description" : "",
         "label" : "Drop Tech",
         "xPos" : 1160,
-        "yPos" : 290,
+        "yPos" : 420,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "StreamSelector_03OutputLane1487856835497" ],
@@ -927,8 +969,8 @@
       "uiInfo" : {
         "description" : "",
         "label" : "Response Pivoter",
-        "xPos" : 1382.5,
-        "yPos" : 287.5,
+        "xPos" : 1380,
+        "yPos" : 420,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "FieldRemover_01OutputLane14877740224980" ],
@@ -962,7 +1004,7 @@
         "description" : "",
         "label" : "Response Flattener",
         "xPos" : 1600,
-        "yPos" : 290,
+        "yPos" : 420,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "FieldPivoter_01OutputLane14877753317630" ],
@@ -1004,7 +1046,7 @@
         "description" : "",
         "label" : "Map To List-Map",
         "xPos" : 1820,
-        "yPos" : 290,
+        "yPos" : 420,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "FieldFlattener_01OutputLane14877754324710" ],
@@ -1050,13 +1092,13 @@
         "value" : "${time:now()}"
       }, {
         "name" : "hdfsTargetConfigBean.maxRecordsPerFile",
-        "value" : 50000
+        "value" : 200000
       }, {
         "name" : "hdfsTargetConfigBean.maxFileSize",
-        "value" : 10
+        "value" : 100
       }, {
         "name" : "hdfsTargetConfigBean.idleTimeout",
-        "value" : "${10 * SECONDS}"
+        "value" : "${30 * SECONDS}"
       }, {
         "name" : "hdfsTargetConfigBean.compression",
         "value" : "NONE"
@@ -1200,7 +1242,7 @@
         "description" : "",
         "label" : "Output TEMP",
         "xPos" : 2040,
-        "yPos" : 290,
+        "yPos" : 420,
         "stageType" : "TARGET"
       },
       "inputLanes" : [ "ExpressionEvaluator_04OutputLane14877759530360" ],
@@ -1231,7 +1273,7 @@
         "description" : "",
         "label" : "File Rename",
         "xPos" : 2260,
-        "yPos" : 440,
+        "yPos" : 570,
         "stageType" : "PROCESSOR"
       },
       "inputLanes" : [ "HadoopFS_01_EventLane" ],
@@ -1307,7 +1349,7 @@
         "description" : "",
         "label" : "Output DIR",
         "xPos" : 2480,
-        "yPos" : 440,
+        "yPos" : 570,
         "stageType" : "EXECUTOR"
       },
       "inputLanes" : [ "GroovyEvaluator_01OutputLane14878415690740" ],
@@ -1348,11 +1390,11 @@
       "title" : "Bulk Match: csv based",
       "description" : "",
       "created" : 1487769041581,
-      "lastModified" : 1488385812155,
+      "lastModified" : 1488386316122,
       "creator" : "admin",
       "lastModifier" : "admin",
       "lastRev" : "0",
-      "uuid" : "01ac135a-1816-4c3b-af6a-a9e86f8528cf",
+      "uuid" : "fc2139f5-5541-47ec-b6f4-5472ab69f86d",
       "valid" : true,
       "metadata" : {
         "labels" : [ ]
