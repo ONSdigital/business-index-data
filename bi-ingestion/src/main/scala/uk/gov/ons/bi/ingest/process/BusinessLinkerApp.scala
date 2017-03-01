@@ -50,7 +50,7 @@ object BusinessLinkerApp extends App {
     readFile(linkingPath).mkString("\n")
   )
 
-  val header = s""""ID","$BiName","$BiUprn","$BiIndustryCode","$BiLegalStatus","$BiTradingStatus","$BiTurnover","$BiEmploymentBand""""
+  val header = s""""ID","$BiName","$BiUprn","$BiIndustryCode","$BiLegalStatus","$BiTradingStatus","$BiTurnover","$BiEmploymentBand", "$BiVatRefs", "$BiPayeRefs" """
 
   printToFile(outPath) { writer =>
     writer.println(header)
@@ -66,7 +66,7 @@ object BusinessLinkerApp extends App {
   //  }
 
   val initialization = getProp("elastic.recreate.index").toBoolean
-  val initFuture = if (initialization) elasticImporter.initializeIndex(biName) else Future.successful()
+  val initFuture = if (initialization) elasticImporter.initializeIndex(biName) else Future.successful {}
   val resFutures = initFuture.flatMap(x => elasticImporter.loadBusinessIndexFromMapDS(biName, busObjs))
   // blocking, for test purposes only
   val loadTimeout = Option(System.getProperty("indexing.timeout")).getOrElse("100").toInt // TODO: ???
@@ -75,9 +75,13 @@ object BusinessLinkerApp extends App {
     case Success(ress) =>
 
       ress.foreach { r =>
-        val cr = r.items
-        // val cr2 = cr.map(ra => ra.indexResult.get.isCreated)
-        logger.info(s"Successfully imported data. Total: ${cr.size}") // , created: ${cr.count(_ == (true))}")
+        if (r.hasFailures) {
+          logger.error(s"Failed while importing data: ${r.failureMessage}")
+        } else {
+          val cr = r.items
+          // val cr2 = cr.map(ra => ra.indexResult.get.isCreated)
+          logger.info(s"Successfully imported data. Total: ${cr.size}") // , created: ${cr.count(_ == (true))}")
+        }
       }
 
     case Failure(err) => logger.error("Unable to import data", err)

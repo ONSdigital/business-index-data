@@ -35,12 +35,14 @@ class BusinessLinker(implicit config: Config) {
         id = extractor.uprn,
         businessName = extractor.companyName,
         uprn = extractor.uprn,
-        postCode = extractor.postCode,
-        industryCode = extractor.industryCode,
-        legalStatus = extractor.legalStatus,
-        tradingStatus = extractor.tradingStatus,
-        turnover = extractor.turnover,
-        employmentBands = extractor.employment
+        postCode = Some(extractor.postCode),
+        industryCode = Some(extractor.industryCode),
+        legalStatus = Some(extractor.legalStatus),
+        tradingStatus = Some(extractor.tradingStatus),
+        turnover = Some(extractor.turnover),
+        employmentBands = Some(extractor.employment),
+        vatRefs = Some(extractor.vatRefs),
+        payeRefs = Some(extractor.payeRefs)
       )
     }
   }

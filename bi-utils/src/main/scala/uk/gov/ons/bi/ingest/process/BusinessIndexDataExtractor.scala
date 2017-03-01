@@ -70,4 +70,18 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
     employmentBand(emplNum)
   }
 
+  def vatRefs: Seq[Long] = {
+    cvp match {
+      case BusinessData(_, _, vt, _) => vt.map(_.vatref.toLong)
+      case _ => Seq()
+    }
+  }
+
+  def payeRefs: Seq[String] = {
+    cvp match {
+      case BusinessData(_, _, _, py) => py.map(_.payeref)
+      case _ => Seq()
+    }
+  }
+
 }
