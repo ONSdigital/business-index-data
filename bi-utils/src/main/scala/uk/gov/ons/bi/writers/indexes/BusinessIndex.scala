@@ -43,7 +43,11 @@ class BusinessIndex(val indexName: String) extends Initializer {
 
     field(BiTurnover, StringType) index "not_analyzed" includeInAll false,
 
-    field(BiEmploymentBand, StringType) index "not_analyzed" includeInAll false
+    field(BiEmploymentBand, StringType) index "not_analyzed" includeInAll false,
+
+    field(BiPayeRefs, StringType) analyzer KeywordAnalyzer,
+    field(BiVatRefs, LongType) analyzer KeywordAnalyzer
+
   )
 }
 
