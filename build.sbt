@@ -67,7 +67,8 @@ lazy val businessIndex = (project in file("."))
     moduleName := "business-index-data"
   ).aggregate(
   biUtils,
-  biIngestion
+  biIngestion,
+  biBulkMatch
 )
 
 lazy val biIngestion = (project in file("bi-ingestion"))
@@ -80,6 +81,16 @@ lazy val biIngestion = (project in file("bi-ingestion"))
       //      "org.elasticsearch" %% "elasticsearch-spark" % Versions.elasticSearchSpark excludeAll {
       //        ExclusionRule(organization = "javax.servlet")
       //      }
+    )
+  ).dependsOn(
+  biUtils
+)
+
+lazy val biBulkMatch = (project in file("bi-bulk-match"))
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scalaj" %% "scalaj-http" % "2.3.0"
     )
   ).dependsOn(
   biUtils

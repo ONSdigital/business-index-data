@@ -29,6 +29,7 @@ object Utils {
   }
 
   def writeToFile(name: String, content: String): Unit = {
+    logger.info(s"Write data to file $name")
     printToFile(name) { x =>
       x.println(content)
     }

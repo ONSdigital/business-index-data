@@ -4,8 +4,8 @@ import com.sksamuel.elastic4s.ElasticDsl.{edgeNGramTokenFilter, field, mapping}
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.mappings.FieldType._
 import com.sksamuel.elastic4s.mappings.MappingDefinition
-import uk.gov.ons.bi.writers.Initializer
 import uk.gov.ons.bi.models.BIndexConsts._
+import uk.gov.ons.bi.writers.Initializer
 
 /**
   * Created by Volodymyr.Glushak on 16/02/2017.

@@ -3,40 +3,43 @@ package uk.gov.ons.bi.models
 import java.util
 
 import scala.collection.JavaConverters._
-
-import uk.gov.ons.bi.models.BIndexConsts._
+import uk.gov.ons.bi.models.BIndexConsts.{toString, _}
 
 case class BusinessIndexRec(
-   id: Long, // the same as uprn ?
-   businessName: String,
-   uprn: Long,
-   postCode: Option[String],
-   industryCode: Option[Long],
-   legalStatus: Option[String],
-   tradingStatus: Option[String],
-   turnover: Option[String],
-   employmentBands: Option[String],
-   vatRefs: Option[Seq[Long]],
-   payeRefs: Option[Seq[String]]
-) {
+                             id: Long, // the same as uprn ?
+                             businessName: String,
+                             uprn: Long,
+                             postCode: Option[String],
+                             industryCode: Option[Long],
+                             legalStatus: Option[String],
+                             tradingStatus: Option[String],
+                             turnover: Option[String],
+                             employmentBands: Option[String],
+                             vatRefs: Option[Seq[Long]],
+                             payeRefs: Option[Seq[String]]
+                           ) {
 
   // method that used as output on UI (some fields are hidden)
   def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, postCode = None)
 
-  val Delim = ","
 
-  def toCsv: String =
-    s"""$id$Delim"$businessName"$Delim$uprn$Delim${industryCode.orNull}$Delim
-       |${legalStatus.orNull}$Delim
-       |"${tradingStatus.orNull}"$Delim
-       |"${turnover.orNull}"$Delim
-       |"${employmentBands.orNull}$Delim
-       |"${vatRefs.orNull}"$Delim
-       |${payeRefs.orNull}"$Delim""".stripMargin
+  def toCsvSecured: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
+    tradingStatus, turnover, employmentBands))
+
+  def toCsv: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
+    tradingStatus, turnover, employmentBands, vatRefs, payeRefs))
 
 }
 
 object BusinessIndexRec {
+
+  val Delim = ","
+
+  def toString(fields: List[Any]): String = fields.map {
+    case Some(a) => s"$a"
+    case None => ""
+    case z => s"$z"
+  }.mkString(Delim)
 
   // build business index from elastic search map of fields
   def fromMap(id: Long, map: Map[String, Any]) = BusinessIndexRec(
@@ -74,9 +77,13 @@ object BusinessIndexRec {
     BiPayeRefs -> bi.payeRefs.orNull
   )
 
+  val BiSecuredHeader: String = toString(List("ID", BiName, BiUprn, BiIndustryCode, BiLegalStatus,
+    BiTradingStatus, BiTurnover, BiEmploymentBand))
+
 }
 
 object BIndexConsts {
+
   val BiType = "business"
   val BiName = "BusinessName"
   val BiNameSuggest = "BusinessName_suggest"
@@ -91,4 +98,5 @@ object BIndexConsts {
   val BiPayeRefs = "PayeRefs"
 
   val EmptyStr = ""
+
 }
