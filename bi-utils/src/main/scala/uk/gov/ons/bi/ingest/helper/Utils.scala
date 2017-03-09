@@ -1,6 +1,7 @@
 package uk.gov.ons.bi.ingest.helper
 
 import java.io.File
+import java.nio.file.Paths
 
 import com.typesafe.config.Config
 import org.joda.time.DateTime
@@ -36,7 +37,11 @@ object Utils {
   }
 
   def printToFile(name: String)(op: java.io.PrintWriter => Unit) {
-    val p = new java.io.PrintWriter(new File(name))
+    val file = new File(name)
+    if (!file.getParentFile.exists()) {
+      file.getParentFile.mkdirs()
+    }
+    val p = new java.io.PrintWriter(file)
     try {
       op(p)
     } finally {
@@ -49,7 +54,6 @@ object Utils {
   } catch {
     case NonFatal(e) => throw new RuntimeException(s"Can't get resource $file", e)
   }
-
 
 
   def getPropOrElse(name: String, default: => String)(implicit config: Config): String =

@@ -90,7 +90,8 @@ lazy val biBulkMatch = (project in file("bi-bulk-match"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalaj" %% "scalaj-http" % "2.3.0"
+      "org.scalaj" %% "scalaj-http" % "2.3.0",
+      "javax.mail" % "mail" % "1.4"
     )
   ).dependsOn(
   biUtils

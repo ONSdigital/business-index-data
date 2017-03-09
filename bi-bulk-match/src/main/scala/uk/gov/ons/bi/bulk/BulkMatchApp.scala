@@ -27,7 +27,8 @@ object BulkMatchApp extends App {
     config.getInt("max.parallel.requests"),
     config.getString("bi.api.url"),
     config.getString("bi.in.folder"),
-    config.getString("bi.out.folder")
+    config.getString("bi.out.folder"),
+    config
   )
 
   val fileName = "Isample.csv"

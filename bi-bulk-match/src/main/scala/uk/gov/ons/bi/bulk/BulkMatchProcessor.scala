@@ -19,6 +19,7 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 import scalaj.http.Http
 import scala.concurrent.duration._
+
 /**
   * Created by Volodymyr.Glushak on 09/03/2017.
   */
@@ -48,11 +49,11 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
     * 6. Send email notification
     * In case of exception Err file created with error information
     *
-    * @param f - file name
+    * @param fileName - file name
     */
-  private[this] def processFile(f: String) = withErrHandling(f) {
+  private[this] def processFile(fileName: String) = withErrHandling(fileName) {
     val startTime = System.currentTimeMillis()
-    val (header, content) = parseCsv(s"${cfg.inFolder}/$f")
+    val (header, content) = parseCsv(s"${cfg.inFolder}/$fileName")
     val counter = new AtomicInteger(0)
     val futures = content.map(rec => fileFlow(header, rec, counter))
     val records = futures.size
@@ -61,16 +62,20 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
       case Success(res) =>
         val recGood = res.collect { case Success(s) => s }
         val recFailed = res.collect { case Failure(fa) => fa }
-        writeToFile(s"${cfg.outFolder}/$f.OUT", recGood.flatten.mkString(System.lineSeparator()))
-        if (recFailed.nonEmpty) writeErrors(f, recFailed)
+
+        val headerLine = s"$header,${BusinessIndexRec.BiSecuredHeader}"
+        writeToFile(s"${cfg.outFolder}/$fileName.OUT", (headerLine :: recGood.flatten).mkString(System.lineSeparator()))
+        if (recFailed.nonEmpty) writeErrors(fileName, recFailed)
         val time = System.currentTimeMillis() - startTime
-        logger.info(s"File $f processed in $time ms, rec count: $records (including ${recFailed.size} failures)")
+        val msg = s"File $fileName processed in $time ms, rec count: $records (including ${recFailed.size} failures)"
+        logger.info(msg)
+        sendEmail(fileName, msg)
       case Failure(exx) => throw exx
     }
     Await.result(futSeq, cfg.maxMinutesPerFile minutes)
   }
 
-   private[this] val ex = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(cfg.maxConcurrentReq))
+  private[this] val ex = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(cfg.maxConcurrentReq))
 
   def fileFlow(header: String, rec: String, counter: AtomicInteger): Future[Try[List[String]]] = {
     if (rec.isEmpty) Future.successful(Success(Nil)) // just ignore empty lines
@@ -95,9 +100,10 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
 
   private[this] def performBulkMatch(header: String, rec: String) = {
     val reqEncoded = URLEncoder.encode(rec, "UTF-8")
-    val limit = SearchHeaders(header)
-    val url1 = s"${cfg.biUrl}/$header:$reqEncoded"
-    val url = if (limit < 1) url1 else s"$url1?limit=$limit"
+    val limit = SearchHeaders.find(_.field == header).flatMap { v =>
+      v.responsesPerQuery
+    }.map { x => s"?limit=$x" }.getOrElse("")
+    val url = s"${cfg.biUrl}/$header:$reqEncoded$limit"
     val response = Http(url).asString
     if (Math.random() < 0.01) // print sample messages
       logger.trace(s"Perform request to $url and got: ${response.body}")
@@ -141,14 +147,28 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
   private[this] def parseCsv(fileName: String) = {
     logger.info(s"Parsing file $fileName")
     val header :: content = Utils.readFile(fileName).toList.map(StringHelpers.unquote)
-    if (!SearchHeaders.keys.toList.contains(header)) {
+    if (!SearchHeaders.map(_.field).contains(header)) {
       // we need this error message to be stored in output
-      val err = s"$header based search is not supported."
+      val err = s"$header based search is not supported for $fileName."
       logger.error(err)
       sys.error(err)
     } else {
       (header, content)
     }
+  }
+
+  private[this] def sendEmail(file: String, msg: String) = {
+    if (cfg.cfg.getBoolean("email.service.enabled"))
+      try {
+        val from = cfg.cfg.getString("email.from")
+        val smtpHost = cfg.cfg.getString("email.smtp.host")
+        val agent = new MailAgent(cfg.cfg)
+
+        agent.sendMessage(s"$file processed", msg, "volodymyr.glushak@valtech.co.uk")
+      } catch {
+        case NonFatal(exx) =>
+          logger.error("Exception while sending email", exx) // ignore exceptions from
+      }
   }
 
 }
