@@ -29,7 +29,7 @@ class MailAgent(config: Config) {
 
   // throws MessagingException
   def sendMessage(subject: String, content: String, to: String): Unit = {
-    var message: Message = createMessage
+    val message = createMessage
     message.setFrom(new InternetAddress(config.getString("email.from")))
     setMessageRecipients(message, to, TO)
 

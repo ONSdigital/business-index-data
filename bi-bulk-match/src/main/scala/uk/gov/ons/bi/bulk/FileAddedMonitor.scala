@@ -1,18 +1,18 @@
 package uk.gov.ons.bi.bulk
 
+import java.io.{File, FileFilter}
+import java.nio.file.StandardWatchEventKinds._
 import java.nio.file._
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.BlockingQueue
 
-import scala.collection.JavaConverters._
-import StandardWatchEventKinds._
-import java.io.{File, FileFilter}
-import java.nio.file.attribute.BasicFileAttributes
-
 import org.slf4j.LoggerFactory
+import uk.gov.ons.bi.bulk.FolderScanner._
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Watch for files with specific extention in folder and its subfolders.
@@ -28,9 +28,6 @@ class FileAddedMonitor(rootFolder: String,
   private[this] val path = Paths.get(rootFolder)
 
   private[this] val watcher = FileSystems.getDefault.newWatchService
-
-
-  import FolderScanner._
 
   Files.walkFileTree(path, (f: Path) => {
     if (f.toFile.isDirectory) {

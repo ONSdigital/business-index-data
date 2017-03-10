@@ -100,7 +100,7 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
 
   private[this] def performBulkMatch(header: String, rec: String) = {
     val reqEncoded = URLEncoder.encode(rec, "UTF-8")
-    val limit = SearchHeaders.find(_.field == header).flatMap { v =>
+    val limit = cSearchHeaders.find(_.field == header).flatMap { v =>
       v.responsesPerQuery
     }.map { x => s"?limit=$x" }.getOrElse("")
     val url = s"${cfg.biUrl}/$header:$reqEncoded$limit"
@@ -146,7 +146,7 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
   private[this] def parseCsv(fileName: String) = {
     logger.info(s"Parsing file $fileName")
     val header :: content = Utils.readFile(fileName).toList.map(StringHelpers.unquote)
-    if (!SearchHeaders.map(_.field).contains(header)) {
+    if (!cSearchHeaders.map(_.field).contains(header)) {
       // we need this error message to be stored in output
       val err = s"$header based search is not supported for $fileName."
       logger.error(err)

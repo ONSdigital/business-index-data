@@ -8,7 +8,7 @@ case class BulkType(field: String, responsesPerQuery: Option[Int], responsesPerF
 
 object BulkConsts {
 
-  val SearchHeaders = List(
+  val cSearchHeaders = List(
     BulkType("BusinessName", Some(3), Some(200000)),
     BulkType("IndustryCode", None, Some(200000)),
     BulkType("VatRefs", Some(1), Some(200000)),
