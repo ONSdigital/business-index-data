@@ -1,7 +1,8 @@
 package uk.gov.ons.bi.ingest.process
 
+import uk.gov.ons.bi.ingest.process.BandMappings._
+import uk.gov.ons.bi.ingest.process.ExtractorHelper._
 import uk.gov.ons.bi.models.SICCode
-import BandMappings._
 
 import scala.util.Try
 
@@ -11,24 +12,23 @@ import scala.util.Try
 
 object ExtractorHelper {
 
-  def firstNonEmpty[T](col: Seq[T])(f: T => String) = col.find(obj => f(obj).nonEmpty).map(f)
+  def firstNonEmpty[T](col: Seq[T])(f: T => String): Option[String] = col.find(obj => f(obj).nonEmpty).map(f)
 
 }
 
 class BusinessIndexDataExtractor(val cvp: BusinessData) {
 
-  import ExtractorHelper._
 
-  def companyName = cvp match {
-    case BusinessData(_, ch :: tl, _, _) => firstNonEmpty(ch :: tl)(_.company_name).getOrElse("") // example of how we can iterate throw all records to find first non empty§
+  def companyName: String = cvp match {
+    case BusinessData(_, ch :: tl, _, _) => firstNonEmpty(ch :: tl)(_.company_name).getOrElse("") // example of how we can iterate throw all records to find first non empty
     case BusinessData(_, Nil, vt :: tl, _) => vt.name.nameline1
     case BusinessData(_, Nil, Nil, py :: tl) => py.name.nameline1
     case _ => ""
   }
 
   def uprn: Long = cvp.ubrn.toLong
-  def extractCode(pc: String) = if (pc.length > 1) pc.substring(0, 2) else ""
-  def postCode = cvp match {
+  def extractCode(pc: String): String = if (pc.length > 1) pc.substring(0, 2) else ""
+  def postCode: String = cvp match {
     case BusinessData(_, ch :: tl, _, _) if ch.post_code.length > 1 => extractCode(ch.post_code)
     case BusinessData(_, Nil, vt :: tl, _) => extractCode(vt.address.postcode)
     case BusinessData(_, Nil, Nil, py :: tl) => extractCode(py.address.postcode)

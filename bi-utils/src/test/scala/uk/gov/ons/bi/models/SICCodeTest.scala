@@ -11,8 +11,8 @@ class SICCodeTest extends FlatSpec {
     val default = SICCode("", "", "", "")
 
     assert(default.sicCodeNum == 0)
-    assert(default.copy(sic_text_1 = "sometext").sicCodeNum == 0)
-    assert(default.copy(sic_text_1 = "230021 - industry of fun").sicCodeNum == 230021)
+    assert(default.copy(sicText1 = "sometext").sicCodeNum == 0)
+    assert(default.copy(sicText1 = "230021 - industry of fun").sicCodeNum == 230021)
   }
 
 

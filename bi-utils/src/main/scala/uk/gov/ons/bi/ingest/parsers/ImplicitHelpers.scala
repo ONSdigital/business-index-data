@@ -23,26 +23,25 @@ object ImplicitHelpers {
 
   implicit class TypedString(s: String) {
 
-    def asDateTime = parseDate(s)
+    def asDateTime: DateTime = parseDate(s)
 
-    def asIntOpt = strOption(s).map(_.toDouble.toInt)
+    def asIntOpt: Option[Int] = strOption(s).map(_.toDouble.toInt)
 
-    def asDateTimeOpt = {
+    def asDateTimeOpt: Some[DateTime] = {
       // FIXME: strOption(s).map(x => parseDate(x))
       Some(Date)
     }
   }
 
-  def parseDate(s: String) = {
+  def parseDate(s: String): DateTime = {
      dtfm.parseDateTime(s)
   }
-
 }
 
 object StringHelpers {
 
-  def strOption(s: String) = s match {
-    case null | "" | "\"\"" => None
+  def strOption(s: String): Option[String] = s match {
+    case "" | "\"\"" => None
     case _ => Option(s)
   }
 

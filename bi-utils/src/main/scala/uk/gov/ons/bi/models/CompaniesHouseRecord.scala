@@ -3,14 +3,14 @@ package uk.gov.ons.bi.models
 import org.joda.time.DateTime
 
 case class Accounts(
-  accounts_ref_day: String,
-  accounts_ref_month: String,
-  next_due_date: Option[DateTime],
-  last_made_up_date: Option[DateTime],
-  account_category: Option[String]
+                     accountsRefDay: String,
+                     accountsRefMonth: String,
+                     nextDueDate: Option[DateTime],
+                     lastMadeUpDate: Option[DateTime],
+                     accountCategory: Option[String]
 )
 
-case class Returns(next_due_date: Option[DateTime], last_made_up_date: Option[DateTime])
+case class Returns(nextDueDate: Option[DateTime], lastMadeUpDate: Option[DateTime])
 
 case class Mortgages(
   num_mort_charges: Option[Int],
@@ -29,13 +29,13 @@ object SICCode {
   }
 }
 
-case class SICCode(sic_text_1: String, sic_text_2: String, sic_text_3: String, sic_text_4: String) {
-  def fullText = s"$sic_text_1 $sic_text_2 $sic_text_3 $sic_text_4"
+case class SICCode(sicText1: String, sicText2: String, sicText3: String, sicText4: String) {
+  def fullText = s"$sicText1 $sicText2 $sicText3 $sicText4"
 
   def sicCodeNum = SICCode.code(fullText)
 }
 
-case class LimitedPartnerships(num_gen_partners: Option[Int], num_lim_partners: Option[Int])
+case class LimitedPartnerships(numGenPartners: Option[Int], numLimPartners: Option[Int])
 
 case class PreviousName(condate: String, company_name: String)
 
@@ -51,16 +51,16 @@ case class RegistrationAddress(
 )
 
 case class PreviousNames(
-  previous_name_1: Option[PreviousName],
-  previous_name_2: Option[PreviousName],
-  previous_name_3: Option[PreviousName],
-  previous_name_4: Option[PreviousName],
-  previous_name_5: Option[PreviousName],
-  previous_name_6: Option[PreviousName],
-  previous_name_7: Option[PreviousName],
-  previous_name_8: Option[PreviousName],
-  previous_name_9: Option[PreviousName],
-  previous_name_10: Option[PreviousName]
+                          previousName1: Option[PreviousName],
+                          previousName2: Option[PreviousName],
+                          previousName3: Option[PreviousName],
+                          previousName4: Option[PreviousName],
+                          previousName5: Option[PreviousName],
+                          previousName6: Option[PreviousName],
+                          previousName7: Option[PreviousName],
+                          previousName8: Option[PreviousName],
+                          previousName9: Option[PreviousName],
+                          previousName10: Option[PreviousName]
 )
 
 case class CompaniesHouseRecord(

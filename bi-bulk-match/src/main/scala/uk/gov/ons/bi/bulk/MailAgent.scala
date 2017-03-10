@@ -47,8 +47,8 @@ class MailAgent(config: Config) {
   // throws AddressException, MessagingException
   private[this] def setMessageRecipients(message: Message, recipient: String, recipientType: Message.RecipientType) {
     // had to do the asInstanceOf[...] call here to make scala happy
-    val addressArray = InternetAddress.parse(recipient).asInstanceOf[Array[Address]]
-    if ((addressArray != null) && (addressArray.length > 0)) {
+    Option(InternetAddress.parse(recipient).asInstanceOf[Array[Address]])
+      .filter(_.length > 0).foreach { addressArray =>
       message.setRecipients(recipientType, addressArray)
     }
   }

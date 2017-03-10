@@ -129,14 +129,13 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
   }
 
   private[this] def withErrHandling[T](fileName: String)(f: => T): T = {
-    try {
-      f
-    } catch {
-      case NonFatal(exx) =>
+    Try(f) match {
+      case Success(s) => s
+      case Failure(exx) =>
         logger.error(s"Error while processing $fileName", exx)
         writeErrors(fileName, List(exx))
         throw exx
-      // send email notification about error ...
+      // TODO: send email notification about error ...
     }
   }
 
@@ -159,14 +158,15 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
 
   private[this] def sendEmail(file: String, msg: String) = {
     if (cfg.cfg.getBoolean("email.service.enabled"))
-      try {
+      Try {
         val from = cfg.cfg.getString("email.from")
         val smtpHost = cfg.cfg.getString("email.smtp.host")
         val agent = new MailAgent(cfg.cfg)
 
         agent.sendMessage(s"$file processed", msg, "volodymyr.glushak@valtech.co.uk")
-      } catch {
-        case NonFatal(exx) =>
+      } match {
+        case Success(x) => x
+        case Failure(exx) =>
           logger.error("Exception while sending email", exx) // ignore exceptions from
       }
   }

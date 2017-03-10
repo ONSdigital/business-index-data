@@ -39,13 +39,13 @@ class ElasticImporter()(implicit val config: Config, elastic: ElasticClient) {
 
   def loadBusinessIndex(indexName: String, d: Seq[BusinessIndexRec]): Future[Iterator[BulkResult]] = {
     val r = d.grouped(BatchSize).map { biMap =>
-      if (TheadDelays > 0) Thread.sleep(TheadDelays)
+      if (TheadDelays > 0) Thread.sleep(TheadDelays.toLong)
       logger.debug(s"Bulk of size ${biMap.size} is about to be processed...")
       elastic.execute {
         bulk(
           biMap.map { bi  =>
             logger.trace(s"Indexing entry in ElasticSearch $bi")
-            index into indexName / BiType id bi.id fields BusinessIndexRec.toMap(bi)
+            index into indexName / cBiType id bi.id fields BusinessIndexRec.toMap(bi)
           })
       }
     }

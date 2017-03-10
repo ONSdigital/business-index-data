@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 
 import scala.io.Source
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 /**
@@ -22,10 +22,9 @@ object Utils {
 
   def readFile(filename: String): Iterator[String] = {
     logger.info(s"Reading $filename")
-    try {
-      Source.fromFile(filename).getLines
-    } catch {
-      case NonFatal(e) => throw new RuntimeException(s"Can't read file $filename", e)
+    Try(Source.fromFile(filename).getLines) match {
+      case Success(x) => x
+      case Failure(e) => throw new RuntimeException(s"Can't read file $filename", e)
     }
   }
 
@@ -42,18 +41,14 @@ object Utils {
       file.getParentFile.mkdirs()
     }
     val p = new java.io.PrintWriter(file)
-    try {
-      op(p)
-    } finally {
-      p.close()
-    }
+    Try(op(p)).foreach(x => p.close()) // like finally, ignore errors
   }
 
-  def getResource(file: String): Iterator[String] = try {
-    Source.fromInputStream(getClass.getResourceAsStream(file)).getLines()
-  } catch {
-    case NonFatal(e) => throw new RuntimeException(s"Can't get resource $file", e)
-  }
+  def getResource(file: String): Iterator[String] =
+    Try(Source.fromInputStream(getClass.getResourceAsStream(file)).getLines()) match {
+      case Success(s) => s
+      case Failure(e) => throw new RuntimeException(s"Can't get resource $file", e)
+    }
 
 
   def getPropOrElse(name: String, default: => String)(implicit config: Config): String =

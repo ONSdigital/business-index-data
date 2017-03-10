@@ -2,16 +2,14 @@ package uk.gov.ons.bi.ingest.parsers
 
 import uk.gov.ons.bi.ingest.FlatBiTest
 import uk.gov.ons.bi.ingest.builder.{CHBuilder, PayeBuilder, VATBuilder}
-import uk.gov.ons.bi.ingest.helper.Utils
 import uk.gov.ons.bi.ingest.helper.Utils._
+import uk.gov.ons.bi.ingest.parsers.CsvProcessor._
 import uk.gov.ons.bi.models.BusinessIndexRec
 
 /**
   * Created by Volodymyr.Glushak on 08/02/2017.
   */
 class CsvProcessorTest extends FlatBiTest {
-
-  import CsvProcessor._
 
   val files = Map("/CH_original.csv" -> 199, "/PAYE_original.csv" -> 6,
     "/CH_Output.csv" -> 100, "/PAYE_Output.csv" -> 100, "/VAT_Output.csv" -> 100)
