@@ -31,8 +31,6 @@ object BulkMatchApp extends App {
     config
   )
 
-  val fileName = "Isample.csv"
-
   val queue = new LinkedBlockingQueue[String]
 
   val processor = new BulkMatchProcessor(bulkConfig, queue)
@@ -43,9 +41,7 @@ object BulkMatchApp extends App {
     queue.put(file)
   )
 
-  // queue.put(fileName)
-
-  new FileAddedMonitor(bulkConfig.inFolder, "csv", true, queue)
+  new FileAddedMonitor(bulkConfig.inFolder, "csv", queue)
 
   Await.result(future, 365 days) // restart once a year
 

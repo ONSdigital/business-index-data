@@ -16,20 +16,20 @@ import scala.concurrent.Future
 
 /**
   * Watch for files with specific extention in folder and its subfolders.
-  * Found files should be placed in queue (excluding full path).
+  * Found files should be placed in queue (excluding full rootPath).
   * Created by Volodymyr.Glushak on 09/03/2017.
   */
 class FileAddedMonitor(rootFolder: String,
                        extension: String,
-                       recursive: Boolean,
                        queue: BlockingQueue[String]) {
 
+
   private[this] val logger = LoggerFactory.getLogger(getClass)
-  private[this] val path = Paths.get(rootFolder)
+  private[this] val rootPath = Paths.get(rootFolder)
 
   private[this] val watcher = FileSystems.getDefault.newWatchService
 
-  Files.walkFileTree(path, (f: Path) => {
+  Files.walkFileTree(rootPath, (f: Path) => {
     if (f.toFile.isDirectory) {
       f.register(watcher, ENTRY_CREATE) // interested only in added items
       logger.info(s"Registered watcher for $f")
@@ -39,11 +39,12 @@ class FileAddedMonitor(rootFolder: String,
   def watch() {
     while (true) {
       val watchKey = watcher.take()
+      val dir = watchKey.watchable() match { case p: Path => p }
       watchKey.pollEvents().asScala.foreach { ev =>
         ev.kind() match {
           case ENTRY_CREATE => ev.context() match {
             case p: Path =>
-              val path = p.toFile.toString.replace(rootFolder, "") // remove root path
+              val path = dir.resolve(p).toString.replace(rootPath.toString, "") // remove root rootPath
               queue.add(path)
               logger.info(s"File $path has been added.")
           }
@@ -81,7 +82,7 @@ object FolderScanner {
 
   private[this] val logger = LoggerFactory.getLogger(getClass)
 
-  // TODO: get rid of this path logic - switch to work with paths
+  // TODO: get rid of this path logic - switch to work with Path object
   def findFiles(path: Path, extension: String): List[String] = {
     logger.info(s"Looking for files in $path")
     val pathes = ListBuffer.empty[String]
