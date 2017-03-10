@@ -64,19 +64,19 @@ case class PreviousNames(
 )
 
 case class CompaniesHouseRecord(
-  company_name: String,
-  company_number: String,
-  company_category: String,
-  company_status: String,
-  country_of_origin: String,
-  post_code: String,
-  dissolution_date: Option[DateTime],
-  incorporation_date: Option[DateTime],
-  accounts: Accounts,
-  returns: Option[Returns],
-  sic_code: Option[SICCode],
-  limitedPartnerships: LimitedPartnerships,
-  uri: Option[String],
-  previous_names: PreviousNames
+                                 companyName: String,
+                                 companyNumber: String,
+                                 companyCategory: String,
+                                 companyStatus: String,
+                                 countryOfOrigin: String,
+                                 postCode: String,
+                                 dissolutionDate: Option[DateTime],
+                                 incorporationDate: Option[DateTime],
+                                 accounts: Accounts,
+                                 returns: Option[Returns],
+                                 sicCode: Option[SICCode],
+                                 limitedPartnerships: LimitedPartnerships,
+                                 uri: Option[String],
+                                 previousNames: PreviousNames
 
 )

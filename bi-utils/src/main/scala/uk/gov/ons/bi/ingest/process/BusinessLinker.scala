@@ -55,7 +55,7 @@ class BusinessLinker(implicit config: Config) {
 
     val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap, "paye").flatten.map(py => py.payeref -> py).toMap
 
-    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "ch").flatten.map(ch => ch.company_number -> ch).toMap
+    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "ch").flatten.map(ch => ch.companyNumber -> ch).toMap
 
     val links = LinkedFileParser.parse(linkingData).map { lk => lk.ubrn -> lk }.toMap
 

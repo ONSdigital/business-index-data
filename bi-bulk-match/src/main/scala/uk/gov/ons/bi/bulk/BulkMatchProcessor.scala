@@ -63,7 +63,7 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
         val recGood = res.collect { case Success(s) => s }
         val recFailed = res.collect { case Failure(fa) => fa }
 
-        val headerLine = s"$header,${BusinessIndexRec.BiSecuredHeader}"
+        val headerLine = s"$header,${BusinessIndexRec.cBiSecuredHeader}"
         writeToFile(s"${cfg.outFolder}/$fileName.OUT", (headerLine :: recGood.flatten).mkString(System.lineSeparator()))
         if (recFailed.nonEmpty) writeErrors(fileName, recFailed)
         val time = System.currentTimeMillis() - startTime

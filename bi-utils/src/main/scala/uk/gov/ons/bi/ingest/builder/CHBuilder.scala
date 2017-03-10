@@ -44,20 +44,20 @@ class CHBuilder(val map: Map[String, String])(implicit val config: Config) exten
 
   def build: Option[CompaniesHouseRecord] = handled {
     CompaniesHouseRecord(
-      company_name = map("CompanyName"),
-      company_number = map("CompanyNumber"),
-      company_category = map("CompanyCategory"),
-      company_status = map("CompanyStatus"),
-      country_of_origin = map("CountryOfOrigin"),
-      post_code = mapFirst("RegAddress.PostCode", "RegAddressPostCode"),
-      dissolution_date = map("DissolutionDate").asDateTimeOpt,
-      incorporation_date = map("IncorporationDate").asDateTimeOpt,
+      companyName = map("CompanyName"),
+      companyNumber = map("CompanyNumber"),
+      companyCategory = map("CompanyCategory"),
+      companyStatus = map("CompanyStatus"),
+      countryOfOrigin = map("CountryOfOrigin"),
+      postCode = mapFirst("RegAddress.PostCode", "RegAddressPostCode"),
+      dissolutionDate = map("DissolutionDate").asDateTimeOpt,
+      incorporationDate = map("IncorporationDate").asDateTimeOpt,
       accounts = accountFromMap,
       returns = returnsFromMap.?,
-      sic_code = sicCodeFromMap.?,
+      sicCode = sicCodeFromMap.?,
       limitedPartnerships = limitedPartnershipFromMap,
       uri = None, // save space map("URI").?,
-      previous_names = previousNamesFromMap
+      previousNames = previousNamesFromMap
     )
   }
 

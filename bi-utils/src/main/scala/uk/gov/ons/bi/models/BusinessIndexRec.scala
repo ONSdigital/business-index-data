@@ -78,7 +78,7 @@ object BusinessIndexRec {
     cBiPayeRefs -> bi.payeRefs.orNull
   )
 
-  val BiSecuredHeader: String = toString(List("ID", cBiName, cBiUprn, cBiIndustryCode, cBiLegalStatus,
+  val cBiSecuredHeader: String = toString(List("ID", cBiName, cBiUprn, cBiIndustryCode, cBiLegalStatus,
     cBiTradingStatus, cBiTurnover, cBiEmploymentBand))
 
 }
