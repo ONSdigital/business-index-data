@@ -12,37 +12,40 @@ import scala.concurrent.Await
 /**
   * Created by Volodymyr.Glushak on 09/03/2017.
   */
-object BulkMatchApp extends App {
+object BulkMatchApp {
 
   // create FileMonitor
   // & go through all files in folder
   // populate queue
   // create BulkMatchProcessor with specific queue
 
+  def main(args: Array[String]): Unit = {
 
-  implicit val config = BiConfigManager.envConf(ConfigFactory.load())
 
-  val bulkConfig = BulkConfig(
-    config.getInt("max.minutes.per.file"),
-    config.getInt("max.parallel.requests"),
-    config.getString("bi.api.url"),
-    config.getString("bi.in.folder"),
-    config.getString("bi.out.folder"),
-    config
-  )
+    implicit val config = BiConfigManager.envConf(ConfigFactory.load())
 
-  val queue = new LinkedBlockingQueue[String]
+    val bulkConfig = BulkConfig(
+      config.getInt("max.minutes.per.file"),
+      config.getInt("max.parallel.requests"),
+      config.getString("bi.api.url"),
+      config.getString("bi.in.folder"),
+      config.getString("bi.out.folder"),
+      config
+    )
 
-  val processor = new BulkMatchProcessor(bulkConfig, queue)
+    val queue = new LinkedBlockingQueue[String]
 
-  val future = processor.run()
+    val processor = new BulkMatchProcessor(bulkConfig, queue)
 
-  FolderScanner.findFiles(Paths.get(bulkConfig.inFolder), "csv").foreach(file =>
-    queue.put(file)
-  )
+    val future = processor.run()
 
-  new FileAddedMonitor(bulkConfig.inFolder, "csv", queue)
+    FolderScanner.findFiles(Paths.get(bulkConfig.inFolder), "csv").foreach(file =>
+      queue.put(file)
+    )
 
-  Await.result(future, 365 days) // restart once a year
+    new FileAddedMonitor(bulkConfig.inFolder, "csv", queue)
+
+    Await.result(future, 365 days) // restart once a year
+  }
 
 }
