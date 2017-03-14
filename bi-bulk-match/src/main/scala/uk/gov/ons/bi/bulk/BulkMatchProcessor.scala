@@ -157,11 +157,12 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
   }
 
   private[this] def sendEmail(file: String, msg: String) = {
-    if (cfg.cfg.getBoolean("email.service.enabled"))
+    implicit val config = cfg.cfg
+    if (configOverride("email.service.enabled").toBoolean)
       Try {
-        val from = cfg.cfg.getString("email.from")
-        val smtpHost = cfg.cfg.getString("email.smtp.host")
-        val agent = new MailAgent(cfg.cfg)
+        val from = configOverride("email.from")
+        val smtpHost = configOverride("email.smtp.host")
+        val agent = new MailAgent
 
         agent.sendMessage(s"$file processed", msg, "volodymyr.glushak@valtech.co.uk")
       } match {

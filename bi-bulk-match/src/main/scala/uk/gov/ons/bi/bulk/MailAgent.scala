@@ -6,23 +6,23 @@ import javax.mail._
 import javax.mail.internet._
 
 import com.typesafe.config.Config
-
+import uk.gov.ons.bi.ingest.helper.Utils._
 
 /**
   * Created by Volodymyr.Glushak on 09/03/2017.
   */
-class MailAgent(config: Config) {
+class MailAgent(implicit config: Config) {
 
   private[this] val properties = new Properties()
   private[this] val props = List("mail.smtp.host", "mail.smtp.port", "mail.smtp.auth", "mail.smtp.starttls.enable")
   props.foreach { p =>
-    properties.put(p, config.getString(p))
+    properties.put(p, configOverride(p))
   }
 
-  private[this] val auth = if (config.getBoolean("mail.smtp.auth"))
+  private[this] val auth = if (configOverride("mail.smtp.auth").toBoolean)
     new Authenticator {
       override def getPasswordAuthentication: PasswordAuthentication = {
-        new PasswordAuthentication(config.getString("mail.smtp.user"), config.getString("mail.smtp.password"))
+        new PasswordAuthentication(configOverride("mail.smtp.user"), configOverride("mail.smtp.password"))
       }
     }
   else null
@@ -30,7 +30,7 @@ class MailAgent(config: Config) {
   // throws MessagingException
   def sendMessage(subject: String, content: String, to: String): Unit = {
     val message = createMessage
-    message.setFrom(new InternetAddress(config.getString("email.from")))
+    message.setFrom(new InternetAddress(configOverride("email.from")))
     setMessageRecipients(message, to, TO)
 
     message.setSentDate(new Date())

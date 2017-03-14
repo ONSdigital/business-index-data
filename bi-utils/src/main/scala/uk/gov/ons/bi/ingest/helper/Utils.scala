@@ -55,4 +55,9 @@ object Utils {
   def getProp(name: String)(implicit config: Config): String =
     getPropOrElse(name, sys.error(s"Config $name was not found."))
 
+  // get config from system prop if not found read from typesafe
+  def configOverride(name: String)(implicit config: Config) = {
+    sys.props.getOrElse(name, getProp(name))
+  }
+
 }

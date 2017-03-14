@@ -9,6 +9,8 @@ import uk.gov.ons.bi.writers.BiConfigManager
 import scala.concurrent.duration._
 import scala.concurrent.Await
 
+import uk.gov.ons.bi.ingest.helper.Utils._
+
 /**
   * Created by Volodymyr.Glushak on 09/03/2017.
   */
@@ -21,15 +23,14 @@ object BulkMatchApp {
 
   def main(args: Array[String]): Unit = {
 
-
     implicit val config = BiConfigManager.envConf(ConfigFactory.load())
 
     val bulkConfig = BulkConfig(
-      config.getInt("max.minutes.per.file"),
-      config.getInt("max.parallel.requests"),
-      config.getString("bi.api.url"),
-      config.getString("bi.in.folder"),
-      config.getString("bi.out.folder"),
+      configOverride("max.minutes.per.file").toInt,
+      configOverride("max.parallel.requests").toInt,
+      configOverride("bi.api.url"),
+      configOverride("bi.in.folder"),
+      configOverride("bi.out.folder"),
       config
     )
 
