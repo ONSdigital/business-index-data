@@ -6,6 +6,7 @@ import javax.mail._
 import javax.mail.internet._
 
 import com.typesafe.config.Config
+import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.helper.Utils._
 
 /**
@@ -13,6 +14,7 @@ import uk.gov.ons.bi.ingest.helper.Utils._
   */
 class MailAgent(implicit config: Config) {
 
+  private[this] val logger = LoggerFactory.getLogger(getClass)
   private[this] val properties = new Properties()
   private[this] val props = List("mail.smtp.host", "mail.smtp.port", "mail.smtp.auth", "mail.smtp.starttls.enable")
   props.foreach { p =>
@@ -37,6 +39,7 @@ class MailAgent(implicit config: Config) {
     message.setSubject(subject)
     message.setText(content)
     Transport.send(message)
+    logger.debug(s"Sent email $subject to $to")
   }
 
   private[this] def createMessage: Message = {

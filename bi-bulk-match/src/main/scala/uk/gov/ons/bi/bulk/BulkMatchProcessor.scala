@@ -70,7 +70,10 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
         val msg = s"File $fileName processed in $time ms, rec count: $records (including ${recFailed.size} failures)"
         logger.info(msg)
         sendEmail(fileName, msg)
-      case Failure(exx) => throw exx
+      case Failure(exx) =>
+        logger.error(s"Error in processing records of $fileName", exx)
+        sendEmail(fileName, s"Error in processing records: ${exx.getMessage}")
+        throw exx
     }
     Await.result(futSeq, cfg.maxMinutesPerFile minutes)
   }
@@ -83,9 +86,9 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
       Future {
         val count = counter.incrementAndGet()
         if (count % 1000 == 0) logger.info(s"Processing $count records for $header search...")
-        performBulkMatch(header, rec) match {
-          case x if x.isSuccess => Success(parseResponse(rec, x.body))
-          case f if f.code == 500 =>
+        Try {performBulkMatch(header, rec)} match {
+          case Success(x) if x.isSuccess => Success(parseResponse(rec, x.body))
+          case Success(f) if f.code == 500 =>
             // try again if it's server error without special chars
             val response = performBulkMatch(header, trimSpecialChars(rec))
             if (response.isSuccess) {
@@ -93,7 +96,8 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
             } else {
               buildFailure(rec, response.body)
             }
-          case z => buildFailure(rec, z.body)
+          case Success(z) => buildFailure(rec, z.body)
+          case Failure(z) => buildFailure(rec, z.getMessage)
         }
       }(ex)
   }
@@ -104,9 +108,9 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
       v.responsesPerQuery
     }.map { x => s"?limit=$x" }.getOrElse("")
     val url = s"${cfg.biUrl}/$header:$reqEncoded$limit"
+    logger.trace(s"Perform request to $url")
     val response = Http(url).asString
-    if (Math.random() < 0.01) // print sample messages
-      logger.trace(s"Perform request to $url and got: ${response.body}")
+    logger.trace(s"Got response for $header:$rec: ${response.body}")
     response
   }
 
@@ -128,13 +132,16 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
     Failure(new RuntimeException(msg))
   }
 
-  private[this] def withErrHandling[T](fileName: String)(f: => T): T = {
+  private[this] def withErrHandling[T](fileName: String, silently: Boolean = false)(f: => T): Option[T] = {
     Try(f) match {
-      case Success(s) => s
+      case Success(s) => Some(s)
       case Failure(exx) =>
         logger.error(s"Error while processing $fileName", exx)
-        writeErrors(fileName, List(exx))
-        throw exx
+        if (silently) {
+          writeErrors(fileName, List(exx))
+          sendEmail(fileName, s"Error in processing file $fileName: ${exx.getMessage}")
+        }
+        None
       // TODO: send email notification about error ...
     }
   }
@@ -161,10 +168,9 @@ class BulkMatchProcessor(val cfg: BulkConfig, queue: BlockingQueue[String]) {
     if (configOverride("email.service.enabled").toBoolean)
       Try {
         val from = configOverride("email.from")
-        val smtpHost = configOverride("email.smtp.host")
+        val emailTo = configOverride("email.to")
         val agent = new MailAgent
-
-        agent.sendMessage(s"$file processed", msg, "volodymyr.glushak@valtech.co.uk")
+        agent.sendMessage(s"$file processed", msg, emailTo)
       } match {
         case Success(x) => x
         case Failure(exx) =>

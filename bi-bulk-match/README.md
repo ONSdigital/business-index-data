@@ -27,7 +27,19 @@ This event will be stored in queue.
 In parallel thread, BulkMatchProcessor listen for events that were added to queue.
 It pick up events from queue one by one and send them for processing.
 
+## Run
+
+Via SBT: ```sbt "biBulkMatch/run -Denvironment=local"```
+
+As standalone application.
+1. Assembly jar using sbt: ```sbt assembly```
+2. Run java ```java -Dconfig.file=bulk.conf -Denvironment=local -jar <jar-name>```
+
+Where config.file is typesafe option that allow read configuration from external file (optional).
+
+Configuration can also be overridden via system properties.
+For ex. application is looking for bi.api.url system prop and only if not found look for it in config file (either external or default). 
 
 ## Known issues
 Late directory feature does not work.
-Application need to be restarted each time new sub-folder added, that need to be watched. 
+Application need to be restarted each time new sub-folder added. 
