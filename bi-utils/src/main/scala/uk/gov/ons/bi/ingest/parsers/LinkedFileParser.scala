@@ -26,10 +26,10 @@ object LinkedFileParser {
     val json = JsonMethods.parse(string)
 
     val jsonExtractable = json transformField {
-      case ("UBRN", x) => ("ubrn", x)
-      case ("PAYE", x) => ("paye", x)
-      case ("VAT", x) => ("vat", x)
       case ("CH", x) => ("ch", x)
+      case ("VAT", x) => ("vat", x)
+      case ("PAYE", x) => ("paye", x)
+      case ("UBRN", x) => ("ubrn", x)
     }
 
     implicit val formats = DefaultFormats

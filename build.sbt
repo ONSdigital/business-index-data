@@ -83,7 +83,7 @@ lazy val biIngestion = (project in file("bi-ingestion"))
       //      }
     )
   ).dependsOn(
-  biUtils
+  biUtils % "compile->compile;test->test"
 )
 
 lazy val biBulkMatch = (project in file("bi-bulk-match"))
