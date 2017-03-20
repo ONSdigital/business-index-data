@@ -21,7 +21,7 @@ case class BusinessIndexRec(
 ) {
 
   // method that used as output on UI (some fields are hidden)
-  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, postCode = None)
+  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None)
 
   val Delim = ","
 
