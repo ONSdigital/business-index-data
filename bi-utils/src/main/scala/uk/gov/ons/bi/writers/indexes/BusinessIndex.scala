@@ -34,7 +34,7 @@ class BusinessIndex(val indexName: String) extends Initializer {
 
     field(BiUprn, LongType) analyzer KeywordAnalyzer,
 
-    field(BiPostCode, StringType) analyzer KeywordAnalyzer,
+    field(BiPostCode, StringType) analyzer analyzerName,
 
     field(BiIndustryCode, LongType) analyzer KeywordAnalyzer,
 
