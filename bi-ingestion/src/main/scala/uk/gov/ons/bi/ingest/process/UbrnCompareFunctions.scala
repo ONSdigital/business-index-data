@@ -69,11 +69,12 @@ trait UbrnCompareFunctions {
         oldFileVatMapped.get(newVat)
       })
     ).toMap
-
     val newOneLinkToOne = newEq.filter(_._2.size == 1)
     val oldOneToOneLinked = newOneLinkToOne.values.flatten.toSet
     printSample(newOneLinkToOne.keys.toList)
     printSample(oldOneToOneLinked.toList)
+    logger.debug(s"New-one to old-many cases: ${newEq.count(_._2.size > 1)}")
+    logger.debug(s"New-one to old-0 cases: ${newEq.count(_._2.isEmpty)}")
     logger.debug(s"[SAME UBRN] Records with the same VATs. NEW: ${stats(newOneLinkToOne.keys.toList)}, OLD: ${stats(oldOneToOneLinked.toList)}")
     val res = PairRec(d.oldData.filterNot(oldOneToOneLinked), d.newData.filterNot(newOneLinkToOne.keys.toSet))
     logger.debug(s"After VAT-VAT check left. ${res.pairStats}")
