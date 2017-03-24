@@ -1,5 +1,7 @@
 # business-index-data
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/45803fabda2c4fac8aaf3bc081cbf129)](https://www.codacy.com/app/ONSDigital/business-index-data?utm_source=github.com&utm_medium=referral&utm_content=ONSdigital/business-index-data&utm_campaign=badger)
+
 Set of applications responsible for processing input files with business data and produce business index (in elasticsearch)
 It's available to run as a standalone application or via Apache Spark (TBD).
 
