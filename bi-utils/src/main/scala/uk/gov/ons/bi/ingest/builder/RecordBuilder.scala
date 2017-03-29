@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import uk.gov.ons.bi.ingest.helper.Utils._
 import uk.gov.ons.bi.models.{Address, PayeName, TradStyle}
 
+import scala.util.{Failure, Success, Try}
 import scala.util.control.NonFatal
 
 /**
@@ -20,15 +21,16 @@ trait RecordBuilder[T] {
 
   implicit def config: Config
 
-  protected def ignoreBrokenRecords = getPropOrElse("ignore.csv.errors", "true").toBoolean
+  protected def ignoreBrokenRecords: Boolean = getPropOrElse("ignore.csv.errors", "true").toBoolean
 
   def handled(f: => T): Option[T] = {
-    try {
-      Some(f)
-    } catch {
-      case NonFatal(exc) =>
+    Try(Some(f)) match {
+      case Success(s) => s
+      case Failure(exc) =>
         val msg = s"Exception while building record ${exc.getMessage}. Data map: $map"
-        if (ignoreBrokenRecords) { logger.error(msg, exc); None} else throw new RuntimeException(msg, exc)
+        if (ignoreBrokenRecords) {
+          logger.error(msg, exc); None
+        } else throw new RuntimeException(msg, exc)
     }
   }
 

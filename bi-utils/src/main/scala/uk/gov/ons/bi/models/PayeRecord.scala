@@ -1,10 +1,6 @@
 package uk.gov.ons.bi.models
 
-import java.util.{Calendar, Date}
-
-import org.joda.time.DateTime
 import uk.gov.ons.bi.ingest.helper.Utils
-import uk.gov.ons.bi.ingest.parsers._
 
 case class Address(
   line_1: String,
@@ -21,14 +17,14 @@ case class PayeName(nameline1: String, nameline2: String, nameline3: String) {
 
 case class TradStyle(tradstyle1: String, tradstyle2: String, tradstyle3: String)
 
-case class MonthJobs(dec_jobs: Option[Int], mar_jobs: Option[Int], june_jobs: Option[Int], sept_jobs: Option[Int]) {
+case class MonthJobs(decJobs: Option[Int], marJobs: Option[Int], juneJobs: Option[Int], septJobs: Option[Int]) {
 
-  def recent_jobs = {
-    val mnthVal = Utils.CurrentMonth match {
-      case m if m < 3 && dec_jobs.nonEmpty => dec_jobs
-      case m if m < 6 && mar_jobs.nonEmpty => mar_jobs
-      case m if m < 9 && june_jobs.nonEmpty => june_jobs
-      case _ if sept_jobs.nonEmpty => sept_jobs
+  def recentJobs: Int = {
+    val mnthVal = Utils.cCurrentMonth match {
+      case m if m < 3 && decJobs.nonEmpty => decJobs
+      case m if m < 6 && marJobs.nonEmpty => marJobs
+      case m if m < 9 && juneJobs.nonEmpty => juneJobs
+      case _ if septJobs.nonEmpty => septJobs
       case _ => None
     }
     mnthVal.getOrElse(0)

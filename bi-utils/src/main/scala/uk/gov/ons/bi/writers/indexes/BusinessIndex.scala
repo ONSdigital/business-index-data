@@ -4,15 +4,15 @@ import com.sksamuel.elastic4s.ElasticDsl.{edgeNGramTokenFilter, field, mapping}
 import com.sksamuel.elastic4s.analyzers._
 import com.sksamuel.elastic4s.mappings.FieldType._
 import com.sksamuel.elastic4s.mappings.MappingDefinition
-import uk.gov.ons.bi.writers.Initializer
 import uk.gov.ons.bi.models.BIndexConsts._
+import uk.gov.ons.bi.writers.Initializer
 
 /**
   * Created by Volodymyr.Glushak on 16/02/2017.
   */
 class BusinessIndex(val indexName: String) extends Initializer {
 
-  override def recordName: String = BiType
+  override def recordName: String = cBiType
 
   override def analyzer: Option[AnalyzerDefinition] = Some(
     CustomAnalyzerDefinition(analyzerName,
@@ -29,24 +29,24 @@ class BusinessIndex(val indexName: String) extends Initializer {
     * @return A mapping definition.
     */
   override def indexDefinition: MappingDefinition = mapping(recordName).fields(
-    field(BiName, StringType) boost 4 analyzer analyzerName,
-    field(BiNameSuggest, CompletionType),
+    field(cBiName, StringType) boost 4 analyzer analyzerName,
+    field(cBiNameSuggest, CompletionType),
 
-    field(BiUprn, LongType) analyzer KeywordAnalyzer,
+    field(cBiUprn, LongType) analyzer KeywordAnalyzer,
 
-    field(BiPostCode, StringType) analyzer analyzerName,
+    field(cBiPostCode, StringType) analyzer analyzerName,
 
-    field(BiIndustryCode, LongType) analyzer KeywordAnalyzer,
+    field(cBiIndustryCode, LongType) analyzer KeywordAnalyzer,
 
-    field(BiLegalStatus, StringType) index "not_analyzed" includeInAll false,
-    field(BiTradingStatus, StringType) index "not_analyzed" includeInAll false,
+    field(cBiLegalStatus, StringType) index "not_analyzed" includeInAll false,
+    field(cBiTradingStatus, StringType) index "not_analyzed" includeInAll false,
 
-    field(BiTurnover, StringType) index "not_analyzed" includeInAll false,
+    field(cBiTurnover, StringType) index "not_analyzed" includeInAll false,
 
-    field(BiEmploymentBand, StringType) index "not_analyzed" includeInAll false,
+    field(cBiEmploymentBand, StringType) index "not_analyzed" includeInAll false,
 
-    field(BiPayeRefs, StringType) analyzer KeywordAnalyzer,
-    field(BiVatRefs, LongType) analyzer KeywordAnalyzer
+    field(cBiPayeRefs, StringType) analyzer KeywordAnalyzer,
+    field(cBiVatRefs, LongType) analyzer KeywordAnalyzer
 
   )
 }

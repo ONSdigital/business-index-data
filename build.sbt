@@ -67,7 +67,8 @@ lazy val businessIndex = (project in file("."))
     moduleName := "business-index-data"
   ).aggregate(
   biUtils,
-  biIngestion
+  biIngestion,
+  biBulkMatch
 )
 
 lazy val biIngestion = (project in file("bi-ingestion"))
@@ -82,7 +83,18 @@ lazy val biIngestion = (project in file("bi-ingestion"))
       //      }
     )
   ).dependsOn(
-  biUtils
+  biUtils % "compile->compile;test->test"
+)
+
+lazy val biBulkMatch = (project in file("bi-bulk-match"))
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scalaj" %% "scalaj-http" % "2.3.0",
+      "javax.mail" % "mail" % "1.4"
+    )
+  ).dependsOn(
+  biUtils % "compile->compile;test->test"
 )
 
 // pure library without any dependencies to elasticsearch or spark
@@ -96,6 +108,7 @@ lazy val biUtils = (project in file("bi-utils"))
       "joda-time" % "joda-time" % Versions.joda,
       "org.json4s" %% "json4s-native" % Versions.json4s,
       "org.scalatest" %% "scalatest" % "3.0.0" % Test,
+      "commons-io" % "commons-io" % "2.5",
       "org.slf4j" % "slf4j-api" % "1.7.22",
       "ch.qos.logback" % "logback-classic" % "1.1.7"
     )

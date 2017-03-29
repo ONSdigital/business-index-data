@@ -50,7 +50,7 @@ object BusinessLinkerApp extends App {
     readFile(linkingPath).mkString("\n")
   )
 
-  val header = s""""ID","$BiName","$BiUprn","$BiIndustryCode","$BiLegalStatus","$BiTradingStatus","$BiTurnover","$BiEmploymentBand", "$BiVatRefs", "$BiPayeRefs" """
+  val header = s""""ID","$cBiName","$cBiUprn","$cBiIndustryCode","$cBiLegalStatus","$cBiTradingStatus","$cBiTurnover","$cBiEmploymentBand", "$cBiVatRefs", "$cBiPayeRefs" """
 
   printToFile(outPath) { writer =>
     writer.println(header)

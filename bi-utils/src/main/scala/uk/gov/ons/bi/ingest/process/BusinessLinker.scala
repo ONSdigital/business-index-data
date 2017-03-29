@@ -19,10 +19,10 @@ class BusinessLinker(implicit config: Config) {
                 paye: DataSource[String, PayeRecord2],
                 ch: DataSource[String, CompaniesHouseRecord]): DataSource[String, BusinessIndexRec] = {
     linking.map { x => {
-      val compHouseRec = x.ch.flatMap(ch.getById)
-      val payeRec = x.paye.flatMap(paye.getById)
-      val vatRec = x.vat.flatMap(vat.getById)
-      new BusinessIndexDataExtractor(BusinessData(x.ubrn, compHouseRec, vatRec, payeRec))
+      val compHouseRec = x.ch.flatMap(ch.getById).toList
+      val payeRec = x.paye.flatMap(paye.getById).toList
+      val vatRec = x.vat.flatMap(vat.getById).toList
+      new BusinessIndexDataExtractor(BusinessData(x.ubrn.getOrElse(""), compHouseRec, vatRec, payeRec))
     }
     }.filter(x => x.cvp match {
       case BusinessData(id, Nil, Nil, Nil) =>
@@ -55,9 +55,9 @@ class BusinessLinker(implicit config: Config) {
 
     val payeMapList = csvToMapToObj(payeStream, PayeBuilder.payeFromMap, "paye").flatten.map(py => py.payeref -> py).toMap
 
-    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "ch").flatten.map(ch => ch.company_number -> ch).toMap
+    val chMapList = csvToMapToObj(chStream, CHBuilder.companyHouseFromMap, "ch").flatten.map(ch => ch.companyNumber -> ch).toMap
 
-    val links = LinkedFileParser.parse(linkingData).map { lk => lk.ubrn -> lk }.toMap
+    val links = LinkedFileParser.parse(linkingData).map { lk => lk.ubrn.getOrElse("") -> lk }.toMap
 
     logger.info("Input data read completed. Linking data ... ")
 

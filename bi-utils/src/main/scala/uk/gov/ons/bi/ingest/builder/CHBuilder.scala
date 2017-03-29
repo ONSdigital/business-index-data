@@ -9,16 +9,16 @@ import uk.gov.ons.bi.ingest.parsers.ImplicitHelpers._
   */
 object CHBuilder {
 
-  def companyHouseFromMap(map: Map[String, String])(implicit config: Config) = new CHBuilder(map).build
+  def companyHouseFromMap(map: Map[String, String])(implicit config: Config): Option[CompaniesHouseRecord] = new CHBuilder(map).build
 
 }
 
 class CHBuilder(val map: Map[String, String])(implicit val config: Config) extends RecordBuilder[CompaniesHouseRecord] {
 
-  def mapFirst(keys: String*) = {
+  def mapFirst(keys: String*): String = {
     map(keys.find(k => map.get(k).nonEmpty).getOrElse(sys.error(s"Not found keys $keys in CH map $map")))
-  } 
-  
+  }
+
   // CompanyName,CompanyNumber,
   // RegAddressCareOf,RegAddressPOBox,
   // RegAddressAddressLine1,RegAddressAddressLine2,RegAddressPostTown,RegAddressCounty,RegAddressCountry,RegAddressPostCode,
@@ -42,62 +42,62 @@ class CHBuilder(val map: Map[String, String])(implicit val config: Config) exten
   // PreviousName_10CONDATE,PreviousName_10CompanyName
 
 
-  def build = handled {
+  def build: Option[CompaniesHouseRecord] = handled {
     CompaniesHouseRecord(
-      company_name = map("CompanyName"),
-      company_number = map("CompanyNumber"),
-      company_category = map("CompanyCategory"),
-      company_status = map("CompanyStatus"),
-      country_of_origin = map("CountryOfOrigin"),
-      post_code = mapFirst("RegAddress.PostCode", "RegAddressPostCode"),
-      dissolution_date = map("DissolutionDate").asDateTimeOpt,
-      incorporation_date = map("IncorporationDate").asDateTimeOpt,
+      companyName = map("CompanyName"),
+      companyNumber = map("CompanyNumber"),
+      companyCategory = map("CompanyCategory"),
+      companyStatus = map("CompanyStatus"),
+      countryOfOrigin = map("CountryOfOrigin"),
+      postCode = mapFirst("RegAddress.PostCode", "RegAddressPostCode"),
+      dissolutionDate = map("DissolutionDate").asDateTimeOpt,
+      incorporationDate = map("IncorporationDate").asDateTimeOpt,
       accounts = accountFromMap,
       returns = returnsFromMap.?,
-      sic_code = sicCodeFromMap.?,
+      sicCode = sicCodeFromMap.?,
       limitedPartnerships = limitedPartnershipFromMap,
       uri = None, // save space map("URI").?,
-      previous_names = previousNamesFromMap
+      previousNames = previousNamesFromMap
     )
   }
 
   // AccountsAccountRefDay,AccountsAccountRefMonth,AccountsNextDueDate,AccountsLastMadeUpDate,AccountsAccountCategory,
 
 
-  def accountFromMap = {
+  def accountFromMap: Accounts = {
     Accounts(
-      accounts_ref_day = mapFirst("AccountsAccountRefDay", "Accounts.AccountRefDay"),
-      accounts_ref_month = mapFirst("AccountsAccountRefMonth","Accounts.AccountRefMonth"),
-      next_due_date = mapFirst("AccountsNextDueDate", "Accounts.NextDueDate").asDateTimeOpt,
-      last_made_up_date = mapFirst("AccountsLastMadeUpDate", "Accounts.LastMadeUpDate").asDateTimeOpt,
-      account_category = mapFirst("AccountsAccountCategory", "Accounts.AccountCategory").?
+      accountsRefDay = mapFirst("AccountsAccountRefDay", "Accounts.AccountRefDay"),
+      accountsRefMonth = mapFirst("AccountsAccountRefMonth", "Accounts.AccountRefMonth"),
+      nextDueDate = mapFirst("AccountsNextDueDate", "Accounts.NextDueDate").asDateTimeOpt,
+      lastMadeUpDate = mapFirst("AccountsLastMadeUpDate", "Accounts.LastMadeUpDate").asDateTimeOpt,
+      accountCategory = mapFirst("AccountsAccountCategory", "Accounts.AccountCategory").?
     )
   }
 
   // ReturnsNextDueDate,ReturnsLastMadeUpDate,
-  def returnsFromMap = {
+  def returnsFromMap: Returns = {
     Returns(
-      next_due_date = mapFirst("ReturnsNextDueDate", "Returns.NextDueDate").asDateTimeOpt,
-      last_made_up_date = mapFirst("ReturnsLastMadeUpDate", "Returns.LastMadeUpDate").asDateTimeOpt
+      nextDueDate = mapFirst("ReturnsNextDueDate", "Returns.NextDueDate").asDateTimeOpt,
+      lastMadeUpDate = mapFirst("ReturnsLastMadeUpDate", "Returns.LastMadeUpDate").asDateTimeOpt
     )
   }
 
   // SICCodeSicText_1,SICCodeSicText_2,SICCodeSicText_3,SICCodeSicText_4,
-  def sicCodeFromMap = {
+  def sicCodeFromMap: SICCode = {
     SICCode(
-      sic_text_1 = mapFirst("SICCodeSicText_1", "SICCode.SicText_1"),
-      sic_text_2 = mapFirst("SICCodeSicText_2", "SICCode.SicText_2"),
-      sic_text_3 = mapFirst("SICCodeSicText_3", "SICCode.SicText_3"),
-      sic_text_4 = mapFirst("SICCodeSicText_4", "SICCode.SicText_4")
+      sicText1 = mapFirst("SICCodeSicText_1", "SICCode.SicText_1"),
+      sicText2 = mapFirst("SICCodeSicText_2", "SICCode.SicText_2"),
+      sicText3 = mapFirst("SICCodeSicText_3", "SICCode.SicText_3"),
+      sicText4 = mapFirst("SICCodeSicText_4", "SICCode.SicText_4")
     )
   }
 
 
   // LimitedPartnershipsNumGenPartners,LimitedPartnershipsNumLimPartners,
-  def limitedPartnershipFromMap = {
+  def limitedPartnershipFromMap: LimitedPartnerships = {
     LimitedPartnerships(
-      num_gen_partners = mapFirst("LimitedPartnershipsNumGenPartners", "LimitedPartnerships.NumGenPartners").asIntOpt,
-      num_lim_partners = mapFirst("LimitedPartnershipsNumLimPartners", "LimitedPartnerships.NumLimPartners").asIntOpt
+      numGenPartners = mapFirst("LimitedPartnershipsNumGenPartners", "LimitedPartnerships.NumGenPartners").asIntOpt,
+      numLimPartners = mapFirst("LimitedPartnershipsNumLimPartners", "LimitedPartnerships.NumLimPartners").asIntOpt
     )
   }
 
@@ -112,24 +112,22 @@ class CHBuilder(val map: Map[String, String])(implicit val config: Config) exten
   // PreviousName_9CONDATE,PreviousName_9CompanyName,
   // PreviousName_10CONDATE,PreviousName_10CompanyName
 
-  def previousNamesFromMap = {
-    def getPrevName(i: Int) = None //FIXME:    {
-//      PreviousName(
-//        condate = mapFirst(s"PreviousName_${i}CONDATE", s"PreviousName_$i.CONDATE"),
-//        company_name = mapFirst(s"PreviousName_${i}CompanyName", s"PreviousName_$i.CompanyName")
-//      ).?
-//    }
+  def previousNamesFromMap: PreviousNames = {
+    def getPrevName(i: Int) = PreviousName(
+      condate = mapFirst(s"PreviousName_${i}CONDATE", s"PreviousName_$i.CONDATE"),
+      company_name = mapFirst(s"PreviousName_${i}CompanyName", s"PreviousName_$i.CompanyName")
+    ).?
     PreviousNames(
-      previous_name_1 = getPrevName(1),
-      previous_name_2 = getPrevName(2),
-      previous_name_3 = getPrevName(3),
-      previous_name_4 = getPrevName(4),
-      previous_name_5 = getPrevName(5),
-      previous_name_6 = getPrevName(6),
-      previous_name_7 = getPrevName(7),
-      previous_name_8 = getPrevName(8),
-      previous_name_9 = getPrevName(9),
-      previous_name_10 = getPrevName(10)
+      previousName1 = getPrevName(1),
+      previousName2 = getPrevName(2),
+      previousName3 = getPrevName(3),
+      previousName4 = getPrevName(4),
+      previousName5 = getPrevName(5),
+      previousName6 = getPrevName(6),
+      previousName7 = getPrevName(7),
+      previousName8 = getPrevName(8),
+      previousName9 = getPrevName(9),
+      previousName10 = getPrevName(10)
     )
   }
 
