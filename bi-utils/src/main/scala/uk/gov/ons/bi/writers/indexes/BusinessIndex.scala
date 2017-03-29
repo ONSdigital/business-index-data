@@ -17,10 +17,8 @@ class BusinessIndex(val indexName: String) extends Initializer {
   override def analyzer: Option[AnalyzerDefinition] = Some(
     CustomAnalyzerDefinition(analyzerName,
       StandardTokenizer,
-      LowercaseTokenFilter,
-      // next analyzer gives too many false results:
-      edgeNGramTokenFilter(ngramName) minGram 3 maxGram 24
-    )
+      LowercaseTokenFilter
+      )
   )
 
   /**
@@ -36,7 +34,7 @@ class BusinessIndex(val indexName: String) extends Initializer {
 
     field(cBiUprn, LongType) analyzer KeywordAnalyzer,
 
-    field(cBiPostCode, StringType)  boost 4 analyzer analyzerName,
+    field(cBiPostCode, StringType) analyzer analyzerName,
 
     field(cBiIndustryCode, LongType) analyzer KeywordAnalyzer,
 
