@@ -7,17 +7,17 @@ import uk.gov.ons.bi.models.BIndexConsts._
 import scala.collection.JavaConverters._
 
 case class BusinessIndexRec(
-       id: Long, // the same as uprn ?
-       businessName: String,
-       uprn: Option[Long],
-       postCode: Option[String],
-       industryCode: Option[Long],
-       legalStatus: Option[String],
-       tradingStatus: Option[String],
-       turnover: Option[String],
-       employmentBands: Option[String],
-       vatRefs: Option[Seq[Long]],
-       payeRefs: Option[Seq[String]]
+                             id: Long, // the same as uprn ?
+                             businessName: String,
+                             uprn: Option[Long],
+                             postCode: Option[String],
+                             industryCode: Option[Long],
+                             legalStatus: Option[String],
+                             tradingStatus: Option[String],
+                             turnover: Option[String],
+                             employmentBands: Option[String],
+                             vatRefs: Option[Seq[Long]],
+                             payeRefs: Option[Seq[String]]
                            ) {
 
   // method that used as output on UI (some fields are hidden)
@@ -60,10 +60,8 @@ object BusinessIndexRec {
           case x: Int => x.toLong
           case z: Long => z
         }
-      case e: Seq[Long] =>
-        e
-      case e: String =>
-        e.split(",").map(_.toLong)
+      case e: Seq[Long] => e
+      case e: String => e.split(",").map(_.toLong)
     },
     payeRefs = map.get(cBiPayeRefs).map {
       case e: util.ArrayList[String] => e.asScala
