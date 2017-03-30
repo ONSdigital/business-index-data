@@ -7,21 +7,21 @@ import uk.gov.ons.bi.models.BIndexConsts._
 import scala.collection.JavaConverters._
 
 case class BusinessIndexRec(
-       id: Long, // the same as uprn ?
-       businessName: String,
-       uprn: Long,
-       postCode: Option[String],
-       industryCode: Option[Long],
-       legalStatus: Option[String],
-       tradingStatus: Option[String],
-       turnover: Option[String],
-       employmentBands: Option[String],
-       vatRefs: Option[Seq[Long]],
-       payeRefs: Option[Seq[String]]
+                             id: Long, // the same as uprn ?
+                             businessName: String,
+                             uprn: Option[Long],
+                             postCode: Option[String],
+                             industryCode: Option[Long],
+                             legalStatus: Option[String],
+                             tradingStatus: Option[String],
+                             turnover: Option[String],
+                             employmentBands: Option[String],
+                             vatRefs: Option[Seq[Long]],
+                             payeRefs: Option[Seq[String]]
                            ) {
 
   // method that used as output on UI (some fields are hidden)
-  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None)
+  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, uprn = None)
 
 
   def toCsvSecured: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
@@ -46,7 +46,7 @@ object BusinessIndexRec {
   def fromMap(id: Long, map: Map[String, Any]) = BusinessIndexRec(
     id = id,
     businessName = map.getOrElse(cBiName, cEmptyStr).toString,
-    uprn = java.lang.Long.parseLong(map.getOrElse(cBiUprn, 0L).toString),
+    uprn = map.get(cBiUprn).map(x => java.lang.Long.parseLong(x.toString)),
     postCode = map.get(cBiPostCode).map(_.toString),
     industryCode = map.get(cBiIndustryCode).map(_.toString.toLong),
     legalStatus = map.get(cBiLegalStatus).map(_.toString),
@@ -54,7 +54,12 @@ object BusinessIndexRec {
     turnover = map.get(cBiTurnover).map(_.toString),
     employmentBands = map.get(cBiEmploymentBand).map(_.toString),
     vatRefs = map.get(cBiVatRefs).map {
-      case e: util.ArrayList[Long] => e.asScala
+      case e: util.ArrayList[Any] =>
+        // Any: elastic does not guarantee Long return for Long type. It returns type based on actual value
+        e.asScala map {
+          case x: Int => x.toLong
+          case z: Long => z
+        }
       case e: Seq[Long] => e
       case e: String => e.split(",").map(_.toLong)
     },
@@ -67,7 +72,7 @@ object BusinessIndexRec {
 
   def toMap(bi: BusinessIndexRec): Map[String, Any] = Map(
     cBiName -> bi.businessName.toUpperCase,
-    cBiUprn -> bi.uprn,
+    cBiUprn -> bi.uprn.orNull,
     cBiPostCode -> bi.postCode.orNull,
     cBiIndustryCode -> bi.industryCode.orNull,
     cBiLegalStatus -> bi.legalStatus.orNull,

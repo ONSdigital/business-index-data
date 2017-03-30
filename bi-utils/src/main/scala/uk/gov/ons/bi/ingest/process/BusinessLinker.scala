@@ -34,7 +34,7 @@ class BusinessLinker(implicit config: Config) {
       BusinessIndexRec(
         id = extractor.uprn,
         businessName = extractor.companyName,
-        uprn = extractor.uprn,
+        uprn = Option(extractor.uprn),
         postCode = Some(extractor.postCode),
         industryCode = Some(extractor.industryCode),
         legalStatus = Some(extractor.legalStatus),
