@@ -84,11 +84,4 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
     }
   }
 
-  def companyNo: String = {
-    cvp match {
-      case BusinessData(_, ch, _, _) => "test"
-      case _ => "None"
-    }
-  }
-
 }
