@@ -22,7 +22,7 @@ case class BusinessIndexRec(
                            ) {
 
   // method that used as output on UI (some fields are hidden)
-  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, companyNo = None, uprn = None)
+  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, uprn = None)
 
 
   def toCsvSecured: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
