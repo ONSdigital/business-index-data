@@ -46,7 +46,8 @@ class BusinessIndex(val indexName: String) extends Initializer {
     field(cBiEmploymentBand, StringType) index "not_analyzed" includeInAll false,
 
     field(cBiPayeRefs, StringType) analyzer KeywordAnalyzer,
-    field(cBiVatRefs, LongType) analyzer KeywordAnalyzer
+    field(cBiVatRefs, LongType) analyzer KeywordAnalyzer,
+    field(cBiCompanyNo, StringType) analyzer KeywordAnalyzer
 
   )
 }

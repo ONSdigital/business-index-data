@@ -7,28 +7,29 @@ import uk.gov.ons.bi.models.BIndexConsts._
 import scala.collection.JavaConverters._
 
 case class BusinessIndexRec(
-                             id: Long, // the same as uprn ?
-                             businessName: String,
-                             uprn: Option[Long],
-                             postCode: Option[String],
-                             industryCode: Option[Long],
-                             legalStatus: Option[String],
-                             tradingStatus: Option[String],
-                             turnover: Option[String],
-                             employmentBands: Option[String],
-                             vatRefs: Option[Seq[Long]],
-                             payeRefs: Option[Seq[String]]
+       id: Long, // the same as uprn ?
+       businessName: String,
+       uprn: Option[Long],
+       postCode: Option[String],
+       industryCode: Option[Long],
+       legalStatus: Option[String],
+       tradingStatus: Option[String],
+       turnover: Option[String],
+       employmentBands: Option[String],
+       vatRefs: Option[Seq[Long]],
+       payeRefs: Option[Seq[String]],
+       companyNo: Option[String]
                            ) {
 
   // method that used as output on UI (some fields are hidden)
-  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, uprn = None)
+  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, companyNo = None, uprn = None)
 
 
   def toCsvSecured: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
     tradingStatus, turnover, employmentBands))
 
   def toCsv: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
-    tradingStatus, turnover, employmentBands, vatRefs, payeRefs))
+    tradingStatus, turnover, employmentBands, vatRefs, payeRefs, companyNo))
 
 }
 
@@ -67,7 +68,8 @@ object BusinessIndexRec {
       case e: util.ArrayList[String] => e.asScala
       case ps: Seq[String] => ps
       case e: String => e.split(",").toSeq
-    }
+    },
+    companyNo = map.get(cBiCompanyNo).map(_.toString)
   )
 
   def toMap(bi: BusinessIndexRec): Map[String, Any] = Map(
@@ -80,7 +82,8 @@ object BusinessIndexRec {
     cBiTurnover -> bi.turnover.orNull,
     cBiEmploymentBand -> bi.employmentBands.orNull,
     cBiVatRefs -> bi.vatRefs.orNull,
-    cBiPayeRefs -> bi.payeRefs.orNull
+    cBiPayeRefs -> bi.payeRefs.orNull,
+    cBiCompanyNo -> bi.companyNo.orNull
   )
 
   val cBiSecuredHeader: String = toString(List("ID", cBiName, cBiUprn, cBiIndustryCode, cBiLegalStatus,
@@ -102,6 +105,7 @@ object BIndexConsts {
   val cBiEmploymentBand = "EmploymentBands"
   val cBiVatRefs = "VatRefs"
   val cBiPayeRefs = "PayeRefs"
+  val cBiCompanyNo = "CompanyNo"
 
   val cEmptyStr = ""
 

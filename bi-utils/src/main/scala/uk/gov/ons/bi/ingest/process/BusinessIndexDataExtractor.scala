@@ -27,7 +27,9 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
   }
 
   def uprn: Long = cvp.ubrn.toLong
+
   def extractCode(pc: String): String = if (pc.length > 1) pc.substring(0, 2) else ""
+
   def postCode: String = cvp match {
     case BusinessData(_, ch :: tl, _, _) if ch.postCode.length > 1 => extractCode(ch.postCode)
     case BusinessData(_, Nil, vt :: tl, _) => extractCode(vt.address.postcode)
@@ -81,6 +83,13 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
     cvp match {
       case BusinessData(_, _, _, py) => py.map(_.payeref)
       case _ => Seq()
+    }
+  }
+
+  def companyNo: Option[String] = {
+    cvp match {
+      case BusinessData(_, ch :: tail, _, _) => Option(ch.companyNumber)
+      case _ => None
     }
   }
 
