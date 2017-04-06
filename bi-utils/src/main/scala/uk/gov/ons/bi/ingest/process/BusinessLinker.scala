@@ -36,7 +36,7 @@ class BusinessLinker(implicit config: Config) {
         businessName = extractor.companyName,
         uprn = Option(extractor.uprn),
         postCode = Some(extractor.postCode),
-        industryCode = Some(extractor.industryCode),
+        industryCode = extractor.industryCode,
         legalStatus = Some(extractor.legalStatus),
         tradingStatus = Some(extractor.tradingStatus),
         turnover = Some(extractor.turnover),
