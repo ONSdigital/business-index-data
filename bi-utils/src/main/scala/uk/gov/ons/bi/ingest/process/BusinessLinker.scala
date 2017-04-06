@@ -42,7 +42,8 @@ class BusinessLinker(implicit config: Config) {
         turnover = Some(extractor.turnover),
         employmentBands = Some(extractor.employment),
         vatRefs = Some(extractor.vatRefs),
-        payeRefs = Some(extractor.payeRefs)
+        payeRefs = Some(extractor.payeRefs),
+        companyNo = extractor.companyNo
       )
     }
   }
