@@ -16,7 +16,7 @@ class BusinessIndex(val indexName: String) extends Initializer {
 
   override def analyzer: Option[AnalyzerDefinition] = Some(
     CustomAnalyzerDefinition(analyzerName,
-      StandardTokenizer,
+      WhitespaceTokenizer,
       LowercaseTokenFilter
       )
   )
