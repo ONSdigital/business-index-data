@@ -23,9 +23,9 @@ case class Mortgages(
 object SICCode {
 
   private val NumStartRegex = "(\\d+).*".r
-  def code(n: String) = n match {
-    case NumStartRegex(x) => x.toLong
-    case _ => 0L
+  def code(n: String): Option[String] = n match {
+    case NumStartRegex(x) => Option(x)
+    case _ => None
   }
 }
 

@@ -11,7 +11,7 @@ case class BusinessIndexRec(
        businessName: String,
        uprn: Option[Long],
        postCode: Option[String],
-       industryCode: Option[Long],
+       industryCode: Option[String],
        legalStatus: Option[String],
        tradingStatus: Option[String],
        turnover: Option[String],
@@ -22,7 +22,7 @@ case class BusinessIndexRec(
                            ) {
 
   // method that used as output on UI (some fields are hidden)
-  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, companyNo = None, uprn = None)
+  def secured: BusinessIndexRec = this.copy(vatRefs = None, payeRefs = None, uprn = None)
 
 
   def toCsvSecured: String = BusinessIndexRec.toString(List(id, businessName, uprn, industryCode, legalStatus,
@@ -43,13 +43,21 @@ object BusinessIndexRec {
     case z => s"$z"
   }.mkString(Delim)
 
+  private[this] def industryCodeNormalize(s: Option[String]) = s match {
+    case None | Some("") | Some("0") => None
+    case Some(v) if v.length < 5 => Some("0" * (5 - v.length) + v)
+    case Some(v) => Some(v)
+  }
+
+  def normalize(b: BusinessIndexRec): BusinessIndexRec = b.copy(industryCode =  industryCodeNormalize(b.industryCode))
+
   // build business index from elastic search map of fields
   def fromMap(id: Long, map: Map[String, Any]) = BusinessIndexRec(
     id = id,
     businessName = map.getOrElse(cBiName, cEmptyStr).toString,
     uprn = map.get(cBiUprn).map(x => java.lang.Long.parseLong(x.toString)),
     postCode = map.get(cBiPostCode).map(_.toString),
-    industryCode = map.get(cBiIndustryCode).map(_.toString.toLong),
+    industryCode = industryCodeNormalize(map.get(cBiIndustryCode).map(_.toString)),
     legalStatus = map.get(cBiLegalStatus).map(_.toString),
     tradingStatus = map.get(cBiTradingStatus).map(_.toString),
     turnover = map.get(cBiTurnover).map(_.toString),

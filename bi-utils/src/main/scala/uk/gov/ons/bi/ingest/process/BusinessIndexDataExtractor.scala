@@ -37,10 +37,10 @@ class BusinessIndexDataExtractor(val cvp: BusinessData) {
     case _ => ""
   }
 
-  def industryCode: Long = cvp match {
-    case BusinessData(_, ch1 :: tl, _, _) if ch1.sicCode.nonEmpty => ch1.sicCode.map(_.sicCodeNum).getOrElse(0L)
+  def industryCode: Option[String] = cvp match {
+    case BusinessData(_, ch1 :: tl, _, _) if ch1.sicCode.nonEmpty => ch1.sicCode.flatMap(_.sicCodeNum)
     case BusinessData(_, _, vt :: tl, _) => SICCode.code(vt.sic92)
-    case _ => 0L
+    case _ => None
   }
 
   def legalStatus: String = {
